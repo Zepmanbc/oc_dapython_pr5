@@ -27,25 +27,65 @@ L'utilisateur sélectionne 1. Le programme pose les questions suivantes à l'uti
 
 ## 1 - Organiser son travail
 
-Ecrire des user stories pour faire des taches et sous taches
-creer un tableau agile et mettre des deadlines
+*Ecrire des user stories pour faire des taches et sous taches*
 
-Ecrire la documentation pour faire du DDD
+[user_stories.md](user_stories.md)
+
+*creer un tableau agile et mettre des deadlines*
+
+https://trello.com/b/NFvfd67Q/ocdapythonpr5
+
+*Ecrire la documentation pour faire du DDD*
+
+[documentation.md](documentation.md)
 
 ## 2 - Construire la base de données
 
-Ecrire le modèle physique de données 
+*Ecrire le modèle physique de données*
 
-Avoir un script pour la création de la base
+catégories:
+* petit dejeuner
+    * brioche
+    * pate a tartiner
+    * jus de fruit
+    * vienoiserie
+    * cacao
+* dejeuner
+    * sandwich
+    * salade
+    * taboulé
+    * crudité
+    * fromage
+* gouter
+    * biscuits
+    * compotes
+* diner
+    * pizza
+    * gratin
+    * choucroute
+    * ravioli
+* dessert
+    * creme chocolat
+    * glace
+    * patisserie
+    * yaourt aux fruits
 
-Ecrire un script qui récupère les données de OFF pour les mettre dans notre base
+* les données de OFF
+* les données sauvegardées par l'utilisateur
+
+database.png
+
+
+*Avoir un script pour la création de la base*
+
+*Ecrire un script qui récupère les données de OFF pour les mettre dans notre base*
 
 ## 3 - Construire le programme
 
-Lister les fonctionnalitées,faire un diagramme de classe
+*Lister les fonctionnalitées,faire un diagramme de classe*
 
 ## 4 - Intéragir avec la base de données
 
-Ecrire les requetes
+*Ecrire les requetes*
 
-Ecrire la structure du programme
+*Ecrire la structure du programme*
