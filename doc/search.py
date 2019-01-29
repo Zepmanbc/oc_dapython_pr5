@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 import requests
-import json
+# import json
 
 products = {
     "petit dejeuner" : ["brioche", "pate a tartiner", "jus de fruit", "Chocolats en poudre"], 
@@ -11,7 +11,10 @@ products = {
 }
 
 def get_json(item):
-    link = "https://fr.openfoodfacts.org/cgi/search.pl?action=process&search_terms=" + item + "&additives=without&ingredients_from_palm_oil=without&ingredients_that_may_be_from_palm_oil=without&ingredients_from_or_that_may_be_from_palm_oil=without&sort_by=unique_scans_n&page_size=20&axis_x=energy&axis_y=products_n&action=display&json=1"
+    link = """https://fr.openfoodfacts.org/cgi/search.pl?action=process&search_terms={}
+    &additives=without&ingredients_from_palm_oil=without&ingredients_that_may_be_from_palm_oil=without&
+    ingredients_from_or_that_may_be_from_palm_oil=without&sort_by=unique_scans_n&page_size=20&
+    axis_x=energy&axis_y=products_n&action=display&json=1""".format(item)
     return requests.get(link).json()
 
 def print_first(item):
