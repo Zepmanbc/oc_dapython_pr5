@@ -1,2 +1,4 @@
 env/
 .vscode/
+doc/db/db_sqlarchitect.architect~
+out/
