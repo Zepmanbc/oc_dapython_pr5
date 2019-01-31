@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 import requests
-# import json
+import json
 
 products = {
     "petit dejeuner" : ["brioche", "pate a tartiner", "jus de fruit", "Chocolats en poudre"], 
@@ -9,6 +9,12 @@ products = {
     "diner" : ["pizza", "gratin", "choucroute", "ravioli"], 
     "dessert" : ["creme chocolat", "glaces", "patisserie", "yaourt aux fruits"]
 }
+
+# print(json.dumps(products, sort_keys=True, indent=4))
+
+import json
+with open('result.json', 'w') as fp:
+    json.dump(products, fp, indent=4)
 
 def get_json(item):
     link = """https://fr.openfoodfacts.org/cgi/search.pl?action=process&search_terms={}
