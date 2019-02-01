@@ -1,0 +1,12 @@
+@startuml 00_context
+title Diagramme de contexte
+
+rectangle pure_beurre
+actor user
+actor OpenFoofFacts <<system>>
+
+user - pure_beurre
+pure_beurre - OpenFoofFacts
+
+
+@enduml
