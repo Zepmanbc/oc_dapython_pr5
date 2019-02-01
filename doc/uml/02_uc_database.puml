@@ -1,0 +1,13 @@
+@startuml 02_uc_database
+title Diagramme de cas d'utilisation *Database*
+
+package database{
+    (Créer la base de donnée) as CREATE
+    (Remplir la base de donnée) as FILL
+}
+
+actor OpenFoofFacts <<system>>
+
+FILL -- OpenFoofFacts
+
+@enduml

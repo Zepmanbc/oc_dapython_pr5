@@ -25,11 +25,11 @@ Chaque *produit* récupèrera les informations suivantes:
 
 Pour chaque *types de produits*, une sélection de 10 *produits* séléctionnés aléatoirement dans la base sera proposé à l'utilisateur.
 
-un *produit* sera présenté par la concaténation de *product_name* + *brands* + *quantity*.
+Un *produit* sera présenté par la concaténation de *product_name* + *brands* + *quantity*.
 
-une fois un *produit* séléctionné, *stores* et *url* seront affiché et l'utilisateur pourra sélectionner de le rajouter à ses favoris ou retourner afficher 10 propositions.
+Une fois un *produit* séléctionné, *stores* et *url* seront affiché et l'utilisateur pourra sélectionner de le rajouter à ses favoris ou retourner afficher 10 propositions.
 
-l'utilisateur peut afficher la liste des produits qu'il a ajouté à ses favoris par catégories.
+L'utilisateur peut afficher la liste des produits qu'il a ajouté à ses favoris par catégories.
 
 L'interface avec l'utilisateur se fera en mode console avec une intération uniquement par l'envoi de chiffres.
 
@@ -39,15 +39,24 @@ L'interface avec l'utilisateur se fera en mode console avec une intération uniq
 
 # 3 - Décomposition du système
 
+![Diagramme de package](img/01_package.png)
+
 # 4 - Les cas d'utilisation
 
-# 5 - Activités
+![Diagramme de cas d'utilisation GUI](img/02_uc_gui.png)
+![Diagramme de cas d'utilisation DATABASE](img/02_uc_database.png)
+
+# 5 - Parcours
 
 # 6 - Solution Technique
+Une base MySQL et la console.
 
 # 7 - Diagramme de classe
 
 # 8 - Modéle physique de données
 
-lien vers le script
+![Modèle Physique de donnée](img/06_MPD.png)
+
+[Script SQL](../data/dboff.sql)
+
 

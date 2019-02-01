@@ -1,0 +1,21 @@
+@startuml 02_uc_gui
+title Diagrame de cas d'utilisation "GUI"
+
+package GUI{
+    left to right direction
+    (Selectionner une catégorie) as SELECT_CTG
+    (Sélectionner un type de produit) as SELECT_TYP
+    (Sélectionner un produit) as SELECT_PRD
+    (Ajouter un produit en favoris) as ADD_FAV
+    (Consulter la liste des favoris) as SHOW_FAV
+}
+
+actor user
+
+user -- SELECT_CTG
+user -- SELECT_PRD
+user -- SELECT_TYP
+user -- ADD_FAV
+user -- SHOW_FAV
+
+@enduml

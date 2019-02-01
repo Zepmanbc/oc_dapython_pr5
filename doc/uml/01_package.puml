@@ -1,0 +1,16 @@
+@startuml 01_package
+title Diagramme de Package
+
+rectangle pure_beurre {
+    package database
+    package gui
+}
+actor user
+actor OpenFoofFacts <<system>>
+
+gui - database
+gui -- user
+database - OpenFoofFacts
+
+
+@enduml
