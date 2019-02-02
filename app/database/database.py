@@ -14,16 +14,20 @@ class Database():
     db.import_categories("data/categories.json")
     """
 
-    QUANTITY_PRODUCTS = 20
+    QUANTITY_PRODUCTS = 50
     HOST = "localhost"
     USER = "root"
     PASSWD ="root"
     DATABASE = "offdb"
+    SQL_FILE = "app/static/dboff.sql"
+    STRUCTURE = "app/static/categories.json"
 
     def __init__(self):
         """Initialyse the connection."""
         if self.create_connection():
             self.cursor = self.mydb.cursor()
+        else:
+            return False
 
     def create_connection(self):
         """Test MySQL connection."""
@@ -38,8 +42,9 @@ class Database():
             return True
         except mysql.connector.Error as err:
             print(err)
+            return False
 
-    def create_database(self, sql_file):
+    def create_database(self):
         """Read the SQL file and create the database and tables."""
         try:
             self.mydb = mysql.connector.connect(
@@ -55,17 +60,17 @@ class Database():
         self.cursor = self.mydb.cursor()
         commande = ""
         try:
-            for line in open(sql_file):
+            for line in open(self.SQL_FILE):
                 commande += line.replace('\n', ' ')
         except FileNotFoundError:
-            print("File not Found: {}".format(sql_file))
+            print("File not Found: {}".format(self.SQL_FILE))
         try:
             for cmd in commande.split(";"):
                 self.cursor.execute(cmd)
         except mysql.connector.Error as err:
             print(err)
         
-    def fill_in_database(self,json_file):
+    def fill_in_database(self):
         """Import the categories/products from the json and fill the db."""
         try:
             self.cursor
@@ -73,7 +78,7 @@ class Database():
             print("Need to create offdb")
             return None
         
-        with open(json_file) as _f:
+        with open(self.STRUCTURE) as _f:
             categories = json.load(_f)
         
         for category in categories.keys():
@@ -113,6 +118,9 @@ class Database():
                 info[item]
             except:
                 info[item] = ''
+            # Clean data
+            info[item] = info[item].replace('\n', '_')
+
         return info
     
     def _get_off_json(self, item):
@@ -151,18 +159,18 @@ class Database():
         else:
             return False
 
-    def set_favorite(self, id):
+    def set_favorite(self, off_id):
         """set."""
-        self.cursor.execute("UPDATE OffData SET user_favorite = 1 WHERE id = {};".format(str(id)))
-        self.mydb.commit()
-
-    def rem_favorite(self, id):
-        """set."""
-        self.cursor.execute("UPDATE OffData SET user_favorite = 0 WHERE id = {};".format(str(id)))
+        self.cursor.execute("SELECT user_favorite FROM `OffData` WHERE id={}".format(str(off_id)))
+        result = self.cursor.fetchone()[0]
+        if result:
+            self.cursor.execute("UPDATE OffData SET user_favorite = 0 WHERE id = {};".format(str(off_id)))
+        else:
+            self.cursor.execute("UPDATE OffData SET user_favorite = 1 WHERE id = {};".format(str(off_id)))
         self.mydb.commit()
 
     def get_favorites(self):
-        self.cursor.execute("SELECT * FROM `OffData` WHERE user_favorite = 1")
+        self.cursor.execute("SELECT * FROM V_favorite")
         result = self.cursor.fetchall()
         if len(result):
             return result
@@ -173,12 +181,10 @@ if __name__ == "__main__":
     db = Database()
     # db.create_database("app/static/dboff.sql")
     # db.fill_in_database("app/static/categories.json")
-    db.get_category()
+    # db.get_category()
     # print(db.get_type_product(4))
     # print(db.get_product(4))
     # print(db.show_product(64))
-    db.set_favorite(5)
+    # db.set_favorite(5)
     print(db.get_favorites())
-
-
-
+    pass

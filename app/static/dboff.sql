@@ -35,3 +35,15 @@ ADD CONSTRAINT fk_category_id FOREIGN KEY (category_id) REFERENCES Category(id);
 
 ALTER TABLE OffData 
 ADD CONSTRAINT fk_product_id FOREIGN KEY (product_id) REFERENCES Product(id);
+
+CREATE VIEW V_favorite AS
+SELECT 
+    OffData.id as off_id,
+    Category.name as category_name,
+    Product.name as product_type,
+    product_name, brands, quantity
+FROM OffData 
+JOIN Product ON OffData.product_id = Product.id
+JOIN Category ON Product.category_id = Category.id
+WHERE user_favorite= 1
+ORDER BY Category.id, Product.id;
