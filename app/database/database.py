@@ -14,36 +14,58 @@ class Database():
     db.import_categories("data/categories.json")
     """
 
-    QUANTITY_PRODUCTS = 50
+    QUANTITY_PRODUCTS = 20
+    HOST = "localhost"
+    USER = "root"
+    PASSWD ="root"
+    DATABASE = "offdb"
 
     def __init__(self):
         """Initialyse the connection."""
+        if self.create_connection():
+            self.cursor = self.mydb.cursor()
+
+    def create_connection(self):
+        """Test MySQL connection."""
         try:
             self.mydb = mysql.connector.connect(
-                host="localhost",
-                user="root",
-                passwd="root",
-                database="offdb"
+                host=self.HOST,
+                user=self.USER,
+                passwd=self.PASSWD,
+                database=self.DATABASE
             )
-            self.cursor = self.mydb.cursor()
-        except mysql.connector.errors.ProgrammingError:
-            print("Need to create offdb")
-            self.mydb = mysql.connector.connect(
-                host="localhost",
-                user="root",
-                passwd="root"
-            )
+            print("Connection OK")
+            return True
+        except mysql.connector.Error as err:
+            print(err)
 
-    def create(self, sql_file):
+    def create_database(self, sql_file):
         """Read the SQL file and create the database and tables."""
+        try:
+            self.mydb = mysql.connector.connect(
+                host=self.HOST,
+                user=self.USER,
+                passwd=self.PASSWD,
+            )
+            print("Connection OK")
+        except mysql.connector.Error as err:
+            print(err)
+            return False
+
         self.cursor = self.mydb.cursor()
         commande = ""
-        for line in open(sql_file):
-            commande += line.replace('\n', ' ')
-        for cmd in commande.split(";"):
-            self.cursor.execute(cmd)
-
-    def import_categories(self,json_file):
+        try:
+            for line in open(sql_file):
+                commande += line.replace('\n', ' ')
+        except FileNotFoundError:
+            print("File not Found: {}".format(sql_file))
+        try:
+            for cmd in commande.split(";"):
+                self.cursor.execute(cmd)
+        except mysql.connector.Error as err:
+            print(err)
+        
+    def fill_in_database(self,json_file):
         """Import the categories/products from the json and fill the db."""
         try:
             self.cursor
@@ -67,15 +89,15 @@ class Database():
                 self.cursor.execute(sql, val)
                 self.mydb.commit()
                 id_product = self.cursor.lastrowid
-                self.fill_db(product, id_product)
+                self._fill_with_off_data(product, id_product)
 
-    def fill_db(self, item, id_product):
+    def _fill_with_off_data(self, item, id_product):
         """Fill the DB with OFF data for each product type."""
-        _item = self.get_json(item)
+        _item = self._get_off_json(item)
         if _item["count"] > self.QUANTITY_PRODUCTS: _item["count"] = self.QUANTITY_PRODUCTS
         print(item + " - " + str(_item["count"]))
         for info in _item["products"]:
-            info = self.try_info(info)
+            info = self._try_off_info(info)
             sql = "INSERT INTO `OffData` (`product_name`, \
                     `brands`, `quantity`, `stores`, `url`, `product_id`)\
                      VALUES (%s, %s, %s, %s, %s, %s)"
@@ -84,7 +106,7 @@ class Database():
             self.mydb.commit()
     
     @staticmethod
-    def try_info(info):
+    def _try_off_info(info):
         """Test OFF data if all fialds exists, or create missing fields."""
         for item in ["product_name", "brands", "quantity", "stores", "url"]:
             try:
@@ -93,7 +115,7 @@ class Database():
                 info[item] = ''
         return info
     
-    def get_json(self, item):
+    def _get_off_json(self, item):
         """Get data from OFF API."""
         link = """https://fr.openfoodfacts.org/cgi/search.pl?action=process&search_terms={}
         &additives=without&ingredients_from_palm_oil=without&ingredients_that_may_be_from_palm_oil=without&
@@ -101,9 +123,62 @@ class Database():
         axis_x=energy&axis_y=products_n&action=display&json=1""".format(item, self.QUANTITY_PRODUCTS)
         return requests.get(link).json()
 
+    def get_category(self):
+        self.cursor.execute("SELECT * FROM Category")
+        return self.cursor.fetchall()
+
+    def get_type_product(self, category_id):
+        self.cursor.execute("SELECT * FROM Product WHERE category_id={}".format(str(category_id)))
+        result = self.cursor.fetchall()
+        if len(result):
+            return result
+        else:
+            return False
+
+    def get_product(self, product_id):
+        self.cursor.execute("SELECT id, product_name, brands, quantity FROM `OffData` WHERE product_id={} ORDER BY RAND() LIMIT 9".format(str(product_id)))
+        result = self.cursor.fetchall()
+        if len(result):
+            return result
+        else:
+            return False
+
+    def show_product(self, off_id):
+        self.cursor.execute("SELECT * FROM `OffData` WHERE id={}".format(str(off_id)))
+        result = self.cursor.fetchall()
+        if len(result):
+            return result
+        else:
+            return False
+
+    def set_favorite(self, id):
+        """set."""
+        self.cursor.execute("UPDATE OffData SET user_favorite = 1 WHERE id = {};".format(str(id)))
+        self.mydb.commit()
+
+    def rem_favorite(self, id):
+        """set."""
+        self.cursor.execute("UPDATE OffData SET user_favorite = 0 WHERE id = {};".format(str(id)))
+        self.mydb.commit()
+
+    def get_favorites(self):
+        self.cursor.execute("SELECT * FROM `OffData` WHERE user_favorite = 1")
+        result = self.cursor.fetchall()
+        if len(result):
+            return result
+        else:
+            return False
 
 if __name__ == "__main__":
     db = Database()
-    db.create("data/dboff.sql")
-    db.import_categories("data/categories.json")
+    # db.create_database("app/static/dboff.sql")
+    # db.fill_in_database("app/static/categories.json")
+    db.get_category()
+    # print(db.get_type_product(4))
+    # print(db.get_product(4))
+    # print(db.show_product(64))
+    db.set_favorite(5)
+    print(db.get_favorites())
+
+
 
