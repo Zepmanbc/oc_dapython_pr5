@@ -10,7 +10,9 @@ from database.database import Database
 class Gui():
     def __init__(self):
         self.db = Database()
-        if self.db is False:
+        try:
+            self.db.cursor
+        except:
             self.clear()
             print("Création de la base...")
             self.db.create_database()
