@@ -5,12 +5,8 @@ import sys
 sys.path.append('app/')
 from app.gui.gui import Gui
 
-"""
-Try id DB is ok
-if not ask to create
-raise error if mysql doesn't works
-"""
 def main():
+    """Manage the screens sequences."""
     gui = Gui()
     intro = True
     while intro:

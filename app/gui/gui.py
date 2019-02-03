@@ -8,7 +8,21 @@ sys.path.append('app/')
 from database.database import Database
 
 class Gui():
+    """Generate all the screens to navigate throught PureBeurre software.
+
+    initialize the object, the Database will be initialised too
+    gui = Gui()
+
+    Call the screen you need
+    gui.screen_*()
+
+    """
+
     def __init__(self):
+        """Initialise the Database and print intro screen.
+
+        If Database doesn't exist, create and fill it.
+        """
         self.db = Database()
         try:
             self.db.cursor
@@ -20,6 +34,7 @@ class Gui():
             self.db.fill_in_database()
     
     def screen_intro(self):
+        """Print the intro screen."""
         while True:
             self.clear()
             print("""
@@ -37,6 +52,11 @@ class Gui():
                 pass
 
     def screen_category(self):
+        """Print category list.
+
+        From Category TABLE.
+
+        """
         list_category = self.db.get_category()
         while True:
             self.clear()
@@ -53,6 +73,11 @@ class Gui():
                 pass
 
     def screen_type_product(self, category_id):
+        """Print list of product type for a category.
+
+        Args:
+            category_id (int): if from Category TABLE.
+        """
         list_type_product = self.db.get_type_product(category_id)
         while True:
             self.clear()
@@ -72,6 +97,12 @@ class Gui():
                 pass
 
     def screen_product(self, product_id):
+        """Print list of 9 products.
+
+        Args:
+            product_id (int): id of a product type from Product TABLE.
+
+        """
         list_product = self.db.get_product(product_id)
         while True:
             self.clear()
@@ -95,6 +126,12 @@ class Gui():
                 pass
 
     def screen_show_product(self, id_off):
+        """Print detail of a product.
+
+        Args:
+            id_off (int): id of a product from offData TABLE.
+
+        """
         detail = self.db.show_product(id_off)
         while True:
             self.clear()
@@ -134,6 +171,7 @@ class Gui():
                 pass
 
     def screen_show_favorite(self):
+        """Print favorites."""
         list_product = self.db.get_favorites()
         if list_product:
             while True:
@@ -141,7 +179,12 @@ class Gui():
                 number = 0
                 for product in list_product:
                     number += 1
-                    print("{} - {}".format(number, product))
+                    id = product[0]
+                    category_name = "{} - ".format(product[1])
+                    product_type = "{} - ".format(product[2])
+                    product_name = "{} - {} - {}".format(product[3], product[4], product[5])
+                    row = category_name + product_type + product_name
+                    print("{} - {}".format(number, row))
                 
                 print("\n0 - retour")
                 answer = input("\nVotre choix : ")
@@ -160,6 +203,7 @@ class Gui():
     
     @staticmethod
     def clear():
+        """Clear console."""
         if os.uname()[0] == "Windows":
             os.system('cls')
         else:
