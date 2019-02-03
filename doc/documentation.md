@@ -14,15 +14,46 @@ install libraries
 
     pip install -r requirements.txt
 
-initialize the database
+set executable
 
-    ./init.py
+    chmod +x purebeurre.py
+
+# Configure a LAMP server with docker
+
+if you already have apache2 and mysql running, please stop the services
+
+    sudo service apache2 stop
+    sudo service mysql stop
+
+install docker if you don't already got it
+
+    sudo apt-get update && apt-get install docker.io
+
+download and run the LAMP docker
+
+    docker pull lioshi/lamp:php5
+    docker run -d --name=LAMP -v ~/www:/var/www/html -v ~/mysql:/var/lib/mysql -p 80:80 -p 3306:3306 --restart=always lioshi/lamp:php5
+
+set all the rights to root
+
+    docker exec -i -t LAMP /bin/bash 
+
+    >mysql -p
+password is "root"
+
+    mysql> GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY 'root';
+    mysql> exit
+    exit
+
+Now you got a full running LAMP server running in docker
 
 # Run the software
 
-(dont't forget to activate your virtualenv)
+(I suppose your virtualenv is activated and LAMP is running)
 
     ./purebeurre.py
+
+The first time you run it, The database (MySQL) will be created and be filled
 
 ## Search a product
 
