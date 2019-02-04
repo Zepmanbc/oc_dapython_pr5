@@ -8,13 +8,20 @@ sys.path.append('app/')
 from database.database import Database
 
 class Gui():
-    """Generate all the screens to navigate throught PureBeurre software.
+    """Generate all the screens to navigate throught Pur Beurre software.
 
     initialize the object, the Database will be initialised too
     gui = Gui()
 
-    Call the screen you need
-    gui.screen_*()
+    while len(gui.current_screen):
+        gui.screen_select()
+
+    gui.current_screen = [(screen_name, arg), (screen_name, arg)]
+    screen_name (str): method name for wanted screen
+    arg (int): arg for screen method, some screen don't have arg
+    to go back: gui.current_screen.pop()
+
+    gui.screen_select() shows the last screen in gui.current_screen list
 
     """
 
@@ -23,7 +30,17 @@ class Gui():
 
         If Database doesn't exist, create and fill it.
         """
+        self.screen_config = {
+            "screen_intro": self.screen_intro,
+            "screen_category": self.screen_category,
+            "screen_type_product": self.screen_type_product,
+            "screen_product": self.screen_product,
+            "screen_show_product": self.screen_show_product,
+            "screen_show_favorite": self.screen_show_favorite
+        }
+
         self.db = Database()
+        self.current_screen = [("screen_intro",)]
         try:
             self.db.cursor
         except:
@@ -33,6 +50,15 @@ class Gui():
             print("Récupération des données en cours...")
             self.db.fill_in_database()
     
+    def screen_select(self):
+        """Display the last screen in current_screen."""
+        screen = self.current_screen[-1]
+        if len(screen) == 1:
+            self.screen_config[screen[0]]()
+        elif len(screen) == 2:
+            self.screen_config[screen[0]](screen[1])
+
+
     def screen_intro(self):
         """Print the intro screen."""
         while True:
@@ -46,8 +72,13 @@ class Gui():
             answer = input("Votre choix : ")
             try:
                 answer = int(answer)
-                if answer in range(3):
-                    return answer
+                if answer == 1:
+                    self.current_screen.append(("screen_category",))
+                elif answer == 2:
+                    self.current_screen.append(("screen_show_favorite",))
+                elif answer == 0:
+                    self.current_screen.pop()
+                break
             except:
                 pass
 
@@ -67,8 +98,12 @@ class Gui():
 
             try:
                 answer = int(answer)
-                if answer in range(6):
-                    return answer
+                if answer in range(len(list_category) + 1):
+                    if answer == 0:
+                        self.current_screen.pop()
+                    else:
+                        self.current_screen.append(("screen_type_product", answer))
+                    break
             except:
                 pass
 
@@ -91,8 +126,11 @@ class Gui():
             try:
                 answer = int(answer)
                 if answer in range(len(list_type_product) + 1):
-                    if answer == 0: return 0
-                    return list_type_product[answer - 1][0]
+                    if answer == 0:
+                        self.current_screen.pop()
+                    else:
+                        self.current_screen.append(("screen_product", list_type_product[answer - 1][0]))
+                    break
             except:
                 pass
 
@@ -120,8 +158,11 @@ class Gui():
             try:
                 answer = int(answer)
                 if answer in range(len(list_product) + 1):
-                    if answer == 0: return 0
-                    return list_product[answer - 1][0]
+                    if answer == 0:
+                        self.current_screen.pop()
+                    else:
+                        self.current_screen.append(("screen_show_product", list_product[answer - 1][0]))
+                    break
             except:
                 pass
 
@@ -166,7 +207,9 @@ class Gui():
                 if answer in range(2):
                     if answer:
                         self.db.set_favorite(id)
-                    return answer
+                    else:
+                        self.current_screen.pop()
+                    break
             except:
                 pass
 
@@ -192,8 +235,11 @@ class Gui():
                 try:
                     answer = int(answer)
                     if answer in range(len(list_product) + 1):
-                        if answer == 0: return 0
-                        return list_product[answer - 1][0]
+                        if answer == 0:
+                            self.current_screen.pop()
+                        else:
+                            self.current_screen.append(("screen_show_product", list_product[answer - 1][0]))
+                        break
                 except:
                     pass
         else:
@@ -211,13 +257,6 @@ class Gui():
 
 if __name__ == "__main__":
     gui = Gui()
-    # gui.screen_intro()
-    # cat = gui.screen_category()
-    # if cat:
-    #     prod = gui.screen_type_product(cat)
-    #     if prod:
-    #         print(gui.screen_product(prod))
-    # while gui.screen_show_product(5):
-    #     pass
-    gui.screen_show_favorite()
+    gui.current_screen.append(("screen_show_favorite",))
+    gui.screen_select()
     pass
