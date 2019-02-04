@@ -1,5 +1,5 @@
 #! /usr/bin/env python3
-"""Application Pure Beurre pour bien manger."""
+"""Application Pur Beurre pour bien manger."""
 import sys
 
 sys.path.append('app/')

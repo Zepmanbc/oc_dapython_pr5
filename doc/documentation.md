@@ -52,7 +52,7 @@ Now you got a full running LAMP server running in docker.
 
 (I suppose your virtualenv is activated and LAMP is running)
 
-    ./purebeurre.py
+    ./pur_beurre.py
 
 The first time you run it, the database (MySQL) will be created and be filled.
 
