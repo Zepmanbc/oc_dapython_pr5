@@ -286,7 +286,7 @@ class Database():
             return False
 
 if __name__ == "__main__":
-    # db = Database()
+    db = Database()
     # db.create_database("app/static/dboff.sql")
     # db.fill_in_database("app/static/categories.json")
     # db.get_category()
