@@ -8,9 +8,9 @@ from app.gui.gui import Gui
 def main():
     """Manage the screens sequences."""
     gui = Gui()
-    loop = True
-    while len(gui.current_screen):
-        gui.screen_select()
+    if gui.db:
+        while len(gui.current_screen):
+            gui.screen_select()   
 
 if __name__ == "__main__":
     main()

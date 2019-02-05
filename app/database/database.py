@@ -40,7 +40,7 @@ class Database():
         if self.create_connection():
             self.cursor = self.mydb.cursor()
         else:
-            return None
+            self.mydb = False
 
     def create_connection(self):
         """Test MySQL connection.

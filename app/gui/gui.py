@@ -13,8 +13,9 @@ class Gui():
     initialize the object, the Database will be initialised too
     gui = Gui()
 
-    while len(gui.current_screen):
-        gui.screen_select()
+    if gui.db:  # test if connection is OK
+        while len(gui.current_screen):  # loop while there is a screen to show
+            gui.screen_select()
 
     gui.current_screen = [(screen_name, arg), (screen_name, arg)]
     screen_name (str): method name for wanted screen
@@ -40,15 +41,18 @@ class Gui():
         }
 
         self.db = Database()
-        self.current_screen = [("screen_intro",)]
-        try:
-            self.db.cursor
-        except:
-            self.clear()
-            print("Création de la base...")
-            self.db.create_database()
-            print("Récupération des données en cours...")
-            self.db.fill_in_database()
+        if self.db.mydb:
+            self.current_screen = [("screen_intro",)]
+            try:
+                self.db.cursor
+            except:
+                self.clear()
+                print("Création de la base...")
+                self.db.create_database()
+                print("Récupération des données en cours...")
+                self.db.fill_in_database()
+        else:
+            self.db = False
     
     def screen_select(self):
         """Display the last screen in current_screen."""
@@ -119,7 +123,7 @@ class Gui():
             number = 0
             for type_product in list_type_product:
                 number += 1
-                print("{} - {} - (id:{})".format(number, type_product[1], type_product[0]))
+                print("{} - {}".format(number, type_product[1]))
             print("\n0 - retour")
             answer = input("\nVotre choix : ")
             
@@ -147,11 +151,11 @@ class Gui():
             number = 0
             for product in list_product:
                 number += 1
-                id = product[0]
+                # id = product[0]
                 name = product[1]
                 brand = product[2]
                 qty = product[3]
-                print("{} - {} - {} - {} (id:{})".format(number, name, brand, qty, id ))
+                print("{} - {} - {} - {}".format(number, name, brand, qty))
             print("\n0 - retour")
             answer = input("\nVotre choix : ")
             
@@ -257,6 +261,16 @@ class Gui():
 
 if __name__ == "__main__":
     gui = Gui()
-    gui.current_screen.append(("screen_show_favorite",))
-    gui.screen_select()
+    # if not gui.current_screen in locals():
+    #     gui.current_screen.append(("screen_show_favorite",))
+    #     gui.screen_select()
+
+    # if not hasattr(gui, current_screen):
+
+    try:
+        hasattr(gui, current_screen)
+        gui.current_screen.append(("screen_show_favorite",))
+        gui.screen_select()
+    except NameError:
+        pass
     pass
