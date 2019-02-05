@@ -89,3 +89,9 @@ database.png
 *Ecrire les requetes*
 
 *Ecrire la structure du programme*
+
+# difficultés rencontrées
+
+structure du main pour la logique de sequencage des fenetres
+
+faire les différents raises pour les erreurs de la DB

@@ -1,13 +1,13 @@
 #! /usr/bin/env python3
 
-"""Tests For database."""
+"""Tests For gui."""
 
 import pytest
 
-from app.database.database import Database
+from app.gui.gui import Gui
 
 
-class Test_database():
+class Test_gui():
     """Test."""
 
     def setup(self):

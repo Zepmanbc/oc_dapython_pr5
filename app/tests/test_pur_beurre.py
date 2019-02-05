@@ -1,13 +1,13 @@
 #! /usr/bin/env python3
 
-"""Tests For database."""
+"""Tests For pur_beurre main."""
 
 import pytest
+import pytest_mock
+import pur_beurre
 
-from app.database.database import Database
 
-
-class Test_database():
+class Test_pur_beurre():
     """Test."""
 
     def setup(self):
