@@ -140,7 +140,7 @@ class Database():
         if _item["count"] > self.QUANTITY_PRODUCTS: _item["count"] = self.QUANTITY_PRODUCTS
         print(item + " - " + str(_item["count"]))
         for info in _item["products"]:
-            info = self._try_off_info(info)
+            info = self._clean_info(info)
             sql = "INSERT INTO `OffData` (`product_name`, \
                     `brands`, `quantity`, `stores`, `url`, `product_id`)\
                      VALUES (%s, %s, %s, %s, %s, %s)"
@@ -149,7 +149,7 @@ class Database():
             self.mydb.commit()
     
     @staticmethod
-    def _try_off_info(info):
+    def _clean_info(info):
         r"""Test OFF data if all fields exists, or create missing fields.
 
         Also replace \n with _
