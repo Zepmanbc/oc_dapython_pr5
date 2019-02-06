@@ -265,12 +265,12 @@ if __name__ == "__main__":
     #     gui.current_screen.append(("screen_show_favorite",))
     #     gui.screen_select()
 
-    # if not hasattr(gui, current_screen):
-
-    try:
-        hasattr(gui, current_screen)
-        gui.current_screen.append(("screen_show_favorite",))
-        gui.screen_select()
-    except NameError:
-        pass
+    if not hasattr(gui, "current_screen"):
+        print("C'est mort")
+    # try:
+    #     hasattr(gui, current_screen)
+    #     gui.current_screen.append(("screen_show_favorite",))
+    #     gui.screen_select()
+    # except NameError:
+    #     pass
     pass

@@ -8,7 +8,7 @@ from app.gui.gui import Gui
 def main():
     """Manage the screens sequences."""
     gui = Gui()
-    if gui.db:
+    if hasattr(gui, "current_screen"):
         while len(gui.current_screen):
             gui.screen_select()   
 
