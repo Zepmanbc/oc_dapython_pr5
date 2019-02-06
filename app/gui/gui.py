@@ -3,7 +3,7 @@
 
 import sys
 import os
-# from ..database.database import Database
+
 sys.path.append('app/')
 from database.database import Database
 
@@ -61,7 +61,6 @@ class Gui():
             self.screen_config[screen[0]]()
         elif len(screen) == 2:
             self.screen_config[screen[0]](screen[1])
-
 
     def screen_intro(self):
         """Print the intro screen."""

@@ -6,8 +6,10 @@ package GUI{
     (Selectionner une catégorie) as SELECT_CTG
     (Sélectionner un type de produit) as SELECT_TYP
     (Sélectionner un produit) as SELECT_PRD
+    (Trouver un substitut) as FIND_SUBST
     (Ajouter un produit en favoris) as ADD_FAV
     (Consulter la liste des favoris) as SHOW_FAV
+
 }
 
 actor user
@@ -15,6 +17,7 @@ actor user
 user -- SELECT_CTG
 user -- SELECT_PRD
 user -- SELECT_TYP
+user -- FIND_SUBST
 user -- ADD_FAV
 user -- SHOW_FAV
 

@@ -22,12 +22,20 @@ CREATE TABLE OffData(
     quantity VARCHAR(255),
     stores VARCHAR(255),
     url VARCHAR(255),
-    user_favorite BOOLEAN DEFAULT FALSE,
+    nutrition_grades VARCHAR(1),
     product_id INT UNSIGNED NOT NULL,
     
     PRIMARY KEY (id),
-    INDEX ind_product_id(product_id),
-    INDEX ind_user_favorite(user_favorite)
+    INDEX ind_product_id(product_id)
+);
+
+CREATE TABLE favorite(
+    id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    origin_id INT UNSIGNED NOT NULL,
+    substitute_id INT UNSIGNED NOT NULL,
+
+    PRIMARY KEY (id),
+    INDEX ind_origin_id(origin_id)
 );
 
 ALTER TABLE Product 
@@ -36,14 +44,7 @@ ADD CONSTRAINT fk_category_id FOREIGN KEY (category_id) REFERENCES Category(id);
 ALTER TABLE OffData 
 ADD CONSTRAINT fk_product_id FOREIGN KEY (product_id) REFERENCES Product(id);
 
-CREATE VIEW V_favorite AS
-SELECT 
-    OffData.id as off_id,
-    Category.name as category_name,
-    Product.name as product_type,
-    product_name, brands, quantity
-FROM OffData 
-JOIN Product ON OffData.product_id = Product.id
-JOIN Category ON Product.category_id = Category.id
-WHERE user_favorite= 1
-ORDER BY Category.id, Product.id;
+ALTER TABLE favorite
+ADD CONSTRAINT fk_origin_id FOREIGN KEY (origin_id) REFERENCES OffData(id);
+ALTER TABLE favorite
+ADD CONSTRAINT fk_substitute_id FOREIGN KEY (substitute_id) REFERENCES OffData(id);

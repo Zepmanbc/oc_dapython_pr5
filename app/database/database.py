@@ -5,7 +5,6 @@ import mysql.connector
 import json
 import requests
 
-
 class Database():
     """Create the Database.
 
@@ -37,6 +36,8 @@ class Database():
         Else return None
         
         """
+        self.random_result = list()
+
         if self.create_connection():
             self.cursor = self.mydb.cursor()
         else:
@@ -142,9 +143,16 @@ class Database():
         for info in _item["products"]:
             info = self._clean_info(info)
             sql = "INSERT INTO `OffData` (`product_name`, \
-                    `brands`, `quantity`, `stores`, `url`, `product_id`)\
-                     VALUES (%s, %s, %s, %s, %s, %s)"
-            val = (info["product_name"], info["brands"], info["quantity"], info["stores"], info["url"], id_product)
+                    `brands`, `quantity`, `stores`, `url`, `nutrition_grades`, `product_id`)\
+                     VALUES (%s, %s, %s, %s, %s, %s, %s)"
+            val = (
+                info["product_name"],
+                info["brands"],
+                info["quantity"],
+                info["stores"],
+                info["url"],
+                info["nutrition_grades_tags"][0],
+                id_product)
             self.cursor.execute(sql, val)
             self.mydb.commit()
     
@@ -168,6 +176,8 @@ class Database():
                 info[item] = ''
             # Clean data
             info[item] = info[item].replace('\n', '_')
+        if info["nutrition_grades_tags"][0] in ["unknown", "not-applicable"]:
+            info["nutrition_grades_tags"][0] = ""
 
         return info
     
@@ -184,9 +194,7 @@ class Database():
         
         """
         link = """https://fr.openfoodfacts.org/cgi/search.pl?action=process&search_terms={}
-        &additives=without&ingredients_from_palm_oil=without&ingredients_that_may_be_from_palm_oil=without&
-        ingredients_from_or_that_may_be_from_palm_oil=without&sort_by=unique_scans_n&page_size={}&
-        axis_x=energy&axis_y=products_n&action=display&json=1""".format(item, self.QUANTITY_PRODUCTS)
+        &page_size={}&action=display&json=1""".format(item, self.QUANTITY_PRODUCTS)
         return requests.get(link).json()
 
     def get_category(self):
@@ -221,17 +229,19 @@ class Database():
         """Return 9 random product from a product type.
         
         Args:
-            product_id (int): product_type id
 
         Returns:
-            Dict {[id, product_name, brands, quantity], ...}
-            False if SQL query return nothing.
 
         """
-        self.cursor.execute("SELECT id, product_name, brands, quantity FROM `OffData` WHERE product_id={} ORDER BY RAND() LIMIT 9".format(str(product_id)))
+        self.cursor.execute(
+            """SELECT id, product_name, brands, quantity 
+            FROM `OffData` 
+            WHERE product_id={} 
+            ORDER BY RAND()""".format(str(product_id)))
         result = self.cursor.fetchall()
         if len(result):
-            return result
+            self.random_result = result
+            return True
         else:
             return False
 
@@ -242,7 +252,7 @@ class Database():
             off_id (int): OffData id
 
         Returns:
-            List [id, product_name, brands, quantity, stores, url, user_favorite, product_id]
+            List [id, product_name, brands, quantity, stores, url, nutrition_grades, product_id]
             False if SQL query return nothing.
 
         """
@@ -252,6 +262,28 @@ class Database():
             return result
         else:
             return False
+
+    def show_better_product(self, product_id, grade, offset=0):
+        if not grade: grade = 'z'
+        self.cursor.execute("""SELECT * FROM `OffData` 
+            WHERE product_id={}
+            AND `nutrition_grades` <= '{}'
+            AND `nutrition_grades` <> ''
+            ORDER BY `nutrition_grades`
+            LIMIT 9 OFFSET {}""".format(product_id, grade, offset))
+        result = self.cursor.fetchall()
+        if len(result):
+            return result
+        else:
+            return False
+
+    def set_substitute(slef, origin_id, substitute_id):
+        self.cursor.execute(
+            """INSERT INTO `favorite` 
+            (`origin_id`, `substitute_id`) 
+            VALUES 
+            ('{}', '{}');""".format(origin_id, substitute_id))
+        self.mydb.commit()
 
     def set_favorite(self, off_id):
         """Switch the favorite flag for a product.
@@ -287,11 +319,13 @@ class Database():
 
 if __name__ == "__main__":
     db = Database()
-    # db.create_database("app/static/dboff.sql")
-    # db.fill_in_database("app/static/categories.json")
+    # db.cursor.execute("DROP DATABASE IF EXISTS offdb;")
+    # db.create_database()
+    # db.fill_in_database()
     # db.get_category()
     # print(db.get_type_product(4))
-    # print(db.get_product(4))
+    # print(db.get_product(4,5))
+    print(db.show_better_product(4,''))
     # print(db.show_product(64))
     # db.set_favorite(5)
     # print(db.get_favorites())

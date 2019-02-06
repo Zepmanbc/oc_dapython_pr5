@@ -1,13 +1,13 @@
 @startuml
 
     class category {
-        PK id : int(2)
+        PK id : int()
         --
         name : varchar(255)
     }
 
     class product {
-        PK id : int(2)
+        PK id : int()
         FK id_category
         --
         name : varchar(255)
@@ -22,11 +22,19 @@
         quantity : varchar(255)
         stores : varchar(255)
         url : varchar(255)
-        user_favorite : boolean
+        nutrition_grades : varchar(8)
 
+    }
+
+    class favorite{
+        PK id : int()
+        --
+        FK id_origin
+        FK id_substitute
     }
 
     category "1" *-- "1..*" product
     product "1" *-- "1..*" offData
+    offData "2" - "*" favorite
 
 @enduml
