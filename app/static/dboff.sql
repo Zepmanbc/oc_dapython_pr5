@@ -48,3 +48,18 @@ ALTER TABLE Substitute
 ADD CONSTRAINT fk_origin_id FOREIGN KEY (origin_id) REFERENCES OffData(id) ON DELETE CASCADE;
 ALTER TABLE Substitute
 ADD CONSTRAINT fk_substitute_id FOREIGN KEY (substitute_id) REFERENCES OffData(id) ON DELETE CASCADE;
+
+CREATE VIEW V_Substitute AS
+SELECT 
+Substitute.id as id,
+Category.name as category,
+Product.name as product_type,
+origin_id,
+CONCAT(OD_origin.product_name," - ",OD_origin.brands, " - ", OD_origin.quantity) as origin_designation,
+substitute_id,
+CONCAT(OD_substitute.product_name," - ",OD_substitute.brands, " - ", OD_substitute.quantity) as substitute_designation
+FROM `Substitute` 
+JOIN OffData OD_origin ON origin_id = OD_origin.id
+JOIN OffData OD_substitute ON substitute_id = OD_substitute.id
+JOIN Product ON Product.id = OD_origin.product_id
+JOIN Category ON Category.id = Product.category_id
