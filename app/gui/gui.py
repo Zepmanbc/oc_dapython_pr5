@@ -37,7 +37,7 @@ class Gui():
             "screen_type_product": self.screen_type_product,
             "screen_product": self.screen_product,
             "screen_show_product": self.screen_show_product,
-            "screen_show_favorite": self.screen_show_favorite
+            "screen_show_substitute": self.screen_show_substitute
         }
 
         self.db = Database()
@@ -78,7 +78,7 @@ class Gui():
                 if answer == 1:
                     self.current_screen.append(("screen_category",))
                 elif answer == 2:
-                    self.current_screen.append(("screen_show_favorite",))
+                    self.current_screen.append(("screen_show_substitute",))
                 elif answer == 0:
                     self.current_screen.pop()
                 break
@@ -216,9 +216,9 @@ class Gui():
             except:
                 pass
 
-    def screen_show_favorite(self):
+    def screen_show_substitute(self):
         """Print favorites."""
-        list_product = self.db.get_favorites()
+        list_product = self.db.get_substitute()
         if list_product:
             while True:
                 self.clear()
@@ -226,10 +226,14 @@ class Gui():
                 for product in list_product:
                     number += 1
                     id = product[0]
-                    category_name = "{} - ".format(product[1])
-                    product_type = "{} - ".format(product[2])
+                    category = product[1]
+                    product_type = product[2]
+                    origin_id = product[3]
+                    origin_designation = product[4]
+                    substitude_id = product[5]
+                    substitute_designation = product[6]
                     product_name = "{} - {} - {}".format(product[3], product[4], product[5])
-                    row = category_name + product_type + product_name
+                    row = category + product_type + origin_designation + substitute_designation
                     print("{} - {}".format(number, row))
                 
                 print("\n0 - retour")
@@ -247,7 +251,7 @@ class Gui():
                     pass
         else:
             self.clear()
-            print("*** PAS DE FAVORIS ***")
+            print("*** PAS DE SUBSTITUT ***")
             input("appuyez sur une touche...")
     
     @staticmethod
@@ -260,15 +264,16 @@ class Gui():
 
 if __name__ == "__main__":
     gui = Gui()
+    gui.screen_show_substitute()
     # if not gui.current_screen in locals():
-    #     gui.current_screen.append(("screen_show_favorite",))
+    #     gui.current_screen.append(("screen_show_substitute",))
     #     gui.screen_select()
 
-    if not hasattr(gui, "current_screen"):
-        print("C'est mort")
+    # if not hasattr(gui, "current_screen"):
+    #     print("C'est mort")
     # try:
     #     hasattr(gui, current_screen)
-    #     gui.current_screen.append(("screen_show_favorite",))
+    #     gui.current_screen.append(("screen_show_substitute",))
     #     gui.screen_select()
     # except NameError:
     #     pass
