@@ -277,32 +277,15 @@ class Database():
         else:
             return False
 
-    def set_substitute(slef, origin_id, substitute_id):
+    def set_substitute(self, origin_id, substitute_id):
         self.cursor.execute(
-            """INSERT INTO `favorite` 
+            """INSERT INTO `Substitute` 
             (`origin_id`, `substitute_id`) 
             VALUES 
             ('{}', '{}');""".format(origin_id, substitute_id))
         self.mydb.commit()
 
-    def set_favorite(self, off_id):
-        """Switch the favorite flag for a product.
-        
-        Switch `user_favorite` to 0 or 1depending the previous value.
-
-        Args:
-            off_id (int): OffData id
-        
-        """
-        self.cursor.execute("SELECT user_favorite FROM `OffData` WHERE id={}".format(str(off_id)))
-        result = self.cursor.fetchone()[0]
-        if result:
-            self.cursor.execute("UPDATE OffData SET user_favorite = 0 WHERE id = {};".format(str(off_id)))
-        else:
-            self.cursor.execute("UPDATE OffData SET user_favorite = 1 WHERE id = {};".format(str(off_id)))
-        self.mydb.commit()
-
-    def get_favorites(self):
+    def get_substitute(self):
         """Return the view V_favorite.
         
         Returns:
@@ -310,7 +293,7 @@ class Database():
             False if SQL query return nothing.
 
         """
-        self.cursor.execute("SELECT * FROM V_favorite")
+        self.cursor.execute("SELECT * FROM V_Substitute")
         result = self.cursor.fetchall()
         if len(result):
             return result
@@ -325,8 +308,12 @@ if __name__ == "__main__":
     # db.get_category()
     # print(db.get_type_product(4))
     # print(db.get_product(4,5))
-    print(db.show_better_product(4,''))
+    # print(db.show_better_product(4,''))
     # print(db.show_product(64))
     # db.set_favorite(5)
     # print(db.get_favorites())
+    db.set_substitute(3,6)
+    db.set_substitute(35,65)
+    db.set_substitute(33,64)
+    db.set_substitute(37,67)
     pass
