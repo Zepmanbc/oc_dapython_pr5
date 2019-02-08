@@ -285,6 +285,10 @@ class Database():
             ('{}', '{}');""".format(origin_id, substitute_id))
         self.mydb.commit()
 
+    def delete_substitute(self, id):
+        self.cursor.execute(("DELETE FROM `Substitute` WHERE `id` = {}").format(id))
+        self.mydb.commit()
+
     def get_substitute(self):
         """Return the view V_favorite.
         
@@ -312,8 +316,9 @@ if __name__ == "__main__":
     # print(db.show_product(64))
     # db.set_favorite(5)
     # print(db.get_favorites())
-    db.set_substitute(3,6)
-    db.set_substitute(35,65)
-    db.set_substitute(33,64)
-    db.set_substitute(37,67)
+    # db.set_substitute(3,6)
+    # db.set_substitute(35,65)
+    # db.set_substitute(33,64)
+    # db.set_substitute(37,67)
+    db.delete_substitute(2)
     pass
