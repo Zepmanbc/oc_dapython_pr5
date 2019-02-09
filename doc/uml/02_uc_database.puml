@@ -4,10 +4,12 @@ title Diagramme de cas d'utilisation *Database*
 package database{
     (Créer la base de donnée) as CREATE
     (Remplir la base de donnée) as FILL
+    (Consulter les données) as READ
+    (Enregistrer des données) as SET
 }
 
 actor OpenFoofFacts <<system>>
 
-FILL -- OpenFoofFacts
+FILL -u- OpenFoofFacts
 
 @enduml

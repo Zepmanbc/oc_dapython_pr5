@@ -1,40 +1,31 @@
 @startuml
 
     class category {
-        PK id : int()
+        PK id : int
         --
         name : varchar(255)
     }
 
     class product {
-        PK id : int()
+        PK id : int
         FK id_category
         --
-        name : varchar(255)
-    }
-
-    class offData {
-        PK id : int
-        FK id_product
-        --
-        product-name VARCHAR
+        product-name varchar(255)
         brands : varchar(255)
         quantity : varchar(255)
         stores : varchar(255)
         url : varchar(255)
-        nutrition_grades : varchar(8)
-
+        nutrition_grades : varchar(1)
     }
 
-    class favorite{
-        PK id : int()
+    class substite{
+        PK id : int
         --
         FK id_origin
         FK id_substitute
     }
 
-    category "1" *-- "1..*" product
-    product "1" *-- "1..*" offData
-    offData "2" - "*" favorite
+    category "1" -- "1..*" product
+    product "2" - "*" substite
 
 @enduml

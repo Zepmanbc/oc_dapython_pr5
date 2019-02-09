@@ -1,0 +1,13 @@
+@startuml 04_deployment
+
+actor User
+
+rectangle computer{
+    rectangle CLI
+    database MySQL
+}
+
+User - CLI
+CLI - MySQL
+
+@enduml

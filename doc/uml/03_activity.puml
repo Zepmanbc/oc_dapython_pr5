@@ -1,0 +1,22 @@
+@startuml 03_activity
+
+start
+if (est ce que la DB existe?) then(non)
+    :Creer la base;
+    :remplir la DB;
+else (oui)
+endif
+:Page d'intro;
+if (que voulez vous faire ?) then (choisir un substitut)
+    :Choisir une catégorie;
+    :Choisir un produit + indiquer le grade + pagination;
+    :Choisir du substitut + indiquer le grade + pagination;
+    :Enregistrer une association + Detail du produit;
+else (consulter la liste des substituts)
+    :Liste des Substituts enregistrés;
+    :Détail produit + Substitut;
+endif
+:retour à la page d'intro;
+stop
+
+@enduml
