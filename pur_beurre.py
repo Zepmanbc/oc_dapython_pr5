@@ -6,7 +6,7 @@ sys.path.append('app/')
 from app.gui.gui import Gui
 
 def main():
-    """Manage the screens sequences."""
+    """Run the software."""
     gui = Gui()
     if hasattr(gui, "current_screen"):
         while len(gui.current_screen):

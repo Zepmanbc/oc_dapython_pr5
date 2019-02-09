@@ -225,7 +225,7 @@ class Database():
         else:
             return False
 
-    def get_product(self, product_id):
+    def get_product(self, product_id, offset=0):
         """Return 9 random product from a product type.
         
         Args:
@@ -237,11 +237,12 @@ class Database():
             """SELECT id, product_name, brands, quantity 
             FROM `OffData` 
             WHERE product_id={} 
-            ORDER BY RAND()""".format(str(product_id)))
+            ORDER BY RAND()
+            LIMIT 9 OFFSET {}""".format(str(product_id), offset))
         result = self.cursor.fetchall()
         if len(result):
             self.random_result = result
-            return True
+            return self.random_result
         else:
             return False
 
@@ -277,6 +278,12 @@ class Database():
         else:
             return False
 
+    def show_substitute_detail(self, id_Substitute):
+        self.cursor.execute(
+            "SELECT origin_id, substitute_id FROM V_Substitute WHERE id = {}".format(id_Substitute)
+            )
+        return self.cursor.fetchall()
+
     def set_substitute(self, origin_id, substitute_id):
         self.cursor.execute(
             """INSERT INTO `Substitute` 
@@ -311,7 +318,7 @@ if __name__ == "__main__":
     # db.fill_in_database()
     # db.get_category()
     # print(db.get_type_product(4))
-    # print(db.get_product(4,5))
+    print(db.get_product(4,5))
     # print(db.show_better_product(4,''))
     # print(db.show_product(64))
     # db.set_favorite(5)
@@ -320,5 +327,5 @@ if __name__ == "__main__":
     # db.set_substitute(35,65)
     # db.set_substitute(33,64)
     # db.set_substitute(37,67)
-    db.delete_substitute(2)
+    # print(db.show_substitute_detail(3))
     pass

@@ -1,3 +1,5 @@
+retirer le type de produits et mettre juste une liste de produits avec de la pagination
+
 # Cahier des charges
 
 ## Description du parcours utilisateur
@@ -45,29 +47,15 @@ https://trello.com/b/NFvfd67Q/ocdapythonpr5
 
 catégories:
 * petit dejeuner
-    * brioche
     * pate a tartiner
-    * jus de fruit
-    * vienoiserie
-    * cacao
-* dejeuner
     * sandwich
-    * salade
-    * taboulé
-    * crudité
     * fromage
-* gouter
     * biscuits
     * compotes
-* diner
     * pizza
-    * gratin
     * choucroute
     * ravioli
-* dessert
     * creme chocolat
-    * glace
-    * patisserie
     * yaourt aux fruits
 
 * les données de OFF
