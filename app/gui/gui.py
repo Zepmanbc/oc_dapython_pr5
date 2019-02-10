@@ -39,6 +39,7 @@ class Gui():
             "screen_detail_substitute": self.screen_detail_substitute,
             "screen_show_substitute": self.screen_show_substitute
         }
+        self.product_list = []
 
         self.db = Database()
         if self.db.mydb:
@@ -61,13 +62,14 @@ class Gui():
         screen item is a Tuple
         ("screen_name", *args)
         """
+        self.clear()
         screen = self.current_screen[-1]
         self.screen_config[screen[0]](*screen[1:])
 
     def screen_intro(self):
         """Print the intro screen."""
         while True:
-            self.clear()
+            # self.clear()
             print("""
             1 - Quel aliment souhaitez-vous remplacer ? 
             2 - Retrouver mes aliments substitués.
@@ -88,12 +90,55 @@ class Gui():
                 pass
 
     def screen_select_category(self):
-        print("screen_select_category")
-        pass
+        while True:
+            category_list = self.db.get_category()
+            number = 0
+            print("Selectionnez une catégorie:\n")
+            for category in category_list:
+                number += 1
+                print("{} - {}".format(number, category[1]))
+            print("\n0 - Retour")
+            answer = input("Votre choix : ")
+            try:
+                answer = int(answer)
+                if answer in range(len(category_list)):
+                    if answer == 0:
+                        self.current_screen.pop()
+                    else:
+                        self.current_screen.append(("screen_select_product", category_list[answer][0]))
+                break
+            except:
+                pass
 
-    def screen_select_product(self, category_id, page=0):
-        print("screen_select_product")
-        pass
+    def screen_select_product(self, category_id, page):
+        if not self.db.random_result:
+            self.db.get_product(category_id)
+        while True:
+            product_list = self.db.random_result[page]
+            number = 0
+            print("Selectionnez un produit:\n")
+            for product in product_list:
+                number += 1
+                print("{} - {}".format(number, product[1]))
+            print("\n0 - Retour")
+            answer = input("Votre choix : ")
+            try:
+                answer = int(answer)
+                if answer in range(len(product_list)):
+                    if answer == 0:
+                        self.current_screen.pop()
+                        db.random_result = []
+                    else:
+                        self.current_screen.append(("screen_select_product", product_list[answer][0]))
+                break
+            except:
+                if answer == "n":
+                    self.current_screen[-1] = ("screen_select_product", category_id, page + 1)
+                    break
+                elif answer == "p":
+                    self.current_screen[-1] = ("screen_select_product", category_id, page - 1)
+                    break
+                pass
 
     def screen_select_substitute(self, category_id, nutrition_grade, page=0):
         print("screen_select_substitute")
@@ -107,222 +152,6 @@ class Gui():
         print("screen_show_substitute")
         pass
 
-
-    # def screen_category(self):
-    #     """Print category list.
-
-    #     From Category TABLE.
-
-    #     """
-    #     list_category = self.db.get_category()
-    #     while True:
-    #         self.clear()
-    #         for category in list_category:
-    #             print("{} - {}".format(category[0],category[1]))
-    #         print("\n0 - retour")
-    #         answer = input("\nVotre choix : ")
-
-    #         try:
-    #             answer = int(answer)
-    #             if answer in range(len(list_category) + 1):
-    #                 if answer == 0:
-    #                     self.current_screen.pop()
-    #                 else:
-    #                     self.current_screen.append(("screen_type_product", answer))
-    #                 break
-    #         except:
-    #             pass
-
-    # def screen_product(self, category_id, page=0):
-    #     """Print list of product type for a category.
-
-    #     Args:
-    #         category_id (int): if from Category TABLE.
-    #     """
-    #     list_type_product = self.db.get_type_product(category_id)
-    #     while True:
-    #         self.clear()
-    #         number = 0
-    #         for type_product in list_type_product:
-    #             number += 1
-    #             print("{} - {}".format(number, type_product[1]))
-    #         print("\n0 - retour")
-    #         answer = input("\nVotre choix : ")
-            
-    #         try:
-    #             answer = int(answer)
-    #             if answer in range(len(list_type_product) + 1):
-    #                 if answer == 0:
-    #                     self.current_screen.pop()
-    #                 else:
-    #                     self.current_screen.append(("screen_product", list_type_product[answer - 1][0]))
-    #                 break
-    #         except:
-    #             pass
-
-    # # def screen_product(self, product_id):
-    #     """Print list of 9 products.
-
-    #     Args:
-    #         product_id (int): id of a product type from Product TABLE.
-
-    #     """
-    #     list_product = self.db.get_product(product_id)
-    #     while True:
-    #         self.clear()
-    #         number = 0
-    #         for product in list_product:
-    #             number += 1
-    #             # id = product[0]
-    #             name = product[1]
-    #             brand = product[2]
-    #             qty = product[3]
-    #             print("{} - {} - {} - {}".format(number, name, brand, qty))
-    #         print("\n0 - retour")
-    #         answer = input("\nVotre choix : ")
-            
-    #         try:
-    #             answer = int(answer)
-    #             if answer in range(len(list_product) + 1):
-    #                 if answer == 0:
-    #                     self.current_screen.pop()
-    #                     self.db.random_result = None
-    #                 else:
-    #                     self.current_screen.append(("screen_show_product", list_product[answer - 1][0]))
-    #                 break
-    #         except:
-    #             pass
-
-    # def screen_show_product(self, id_off):
-    #     """Print detail of a product.
-
-    #     Args:
-    #         id_off (int): id of a product from offData TABLE.
-
-    #     """
-    #     detail = self.db.show_product(id_off)
-    #     while True:
-    #         self.clear()
-    #         number = 0
-    #         for product in detail:
-
-    #             id = product[0]
-    #             name = product[1]
-    #             brand = product[2]
-    #             qty = product[3]
-    #             store = product[4]
-    #             url = product[5]
-    #             grade = product[6]
-    #             type_product = product[7]
-
-    #             print("Nom              : {}".format(name))
-    #             print("Marque           : {}".format(brand))
-    #             print("Conditionnement  : {}".format(qty))
-    #             print("Magasins         : {}".format(store))
-    #             print("Lien OFF         : {}".format(url))
-                
-    #         print("\n1 - Sélectionner un substitut")
-    #         print("0 - retour")
-    #         answer = input("\nVotre choix : ")
-            
-    #         try:
-    #             answer = int(answer)
-    #             if answer in range(2):
-    #                 if answer:
-    #                     search = (type_product, grade)
-    #                     self.current_screen.append(("screen_show_substitute", search))
-    #                     # self.db.show_better_products(id)
-    #                 else:
-    #                     self.current_screen.pop()
-    #                 break
-    #         except:
-    #             pass
-
-    # def screen_show_better_product(self, search):
-    #     (product_id, grade) = search
-    #     list_substitute = self.db.show_better_product(product_id, grade)
-    #     for product in list_substitute:
-    #         print(product)
-
-    # def screen_show_substitute(self):
-    #     """Print favorites."""
-    #     list_product = self.db.get_substitute()
-    #     if list_product:
-    #         while True:
-    #             self.clear()
-    #             number = 0
-    #             for product in list_product:
-    #                 number += 1
-    #                 id = product[0]
-    #                 category = product[1]
-    #                 product_type = product[2]
-    #                 origin_id = product[3]
-    #                 origin_designation = product[4]
-    #                 substitude_id = product[5]
-    #                 substitute_designation = product[6]
-    #                 product_name = "{} - {} - {}".format(product[3], product[4], product[5])
-    #                 row = category + product_type + origin_designation + substitute_designation
-    #                 print("{} - {}".format(number, row))
-                
-    #             print("\n0 - retour")
-    #             answer = input("\nVotre choix : ")
-                
-    #             try:
-    #                 answer = int(answer)
-    #                 if answer in range(len(list_product) + 1):
-    #                     if answer == 0:
-    #                         self.current_screen.pop()
-    #                     else:
-    #                         self.current_screen.append(("screen_show_product", list_product[answer - 1][0]))
-    #                     break
-    #             except:
-    #                 pass
-    #     else:
-    #         self.clear()
-    #         print("*** PAS DE SUBSTITUT ***")
-    #         input("appuyez sur une touche...")
-    
-    # def show_substitude_detail(self, id_Substitute):
-    #     [(origin_id, substitute_id)] = self.db.show_substitute_detail(id_Substitute)
-    #     origin_detail = self.db.show_product(origin_id)
-    #     substitute_detail = self.db.show_product(substitute_id)
-    #     while True:
-    #         self.clear()
-    #         message_list = ["Produit de substitution", "Produit d'origine"]
-    #         for detail in [origin_detail, substitute_detail]:
-    #             for product in detail:
-
-    #                 id = product[0]
-    #                 name = product[1]
-    #                 brand = product[2]
-    #                 qty = product[3]
-    #                 store = product[4]
-    #                 url = product[5]
-
-    #                 print(message_list.pop() + "\n")
-    #                 print("Nom              : {}".format(name))
-    #                 print("Marque           : {}".format(brand))
-    #                 print("Conditionnement  : {}".format(qty))
-    #                 print("Magasins         : {}".format(store))
-    #                 print("Lien OFF         : {}".format(url))
-    #                 print("\n")
-                    
-                
-    #         print("1 - Supprimer le lien")
-    #         print("0 - retour")
-    #         answer = input("\nVotre choix : ")
-            
-    #         try:
-    #             answer = int(answer)
-    #             if answer in range(2):
-    #                 if answer:
-    #                     self.db.delete_substitute(id_Substitute)
-    #                 else:
-    #                     self.current_screen.pop()
-    #                 break
-    #         except:
-    #             pass
-
     @staticmethod
     def clear():
         """Clear console."""
@@ -333,6 +162,7 @@ class Gui():
 
 if __name__ == "__main__":
     gui = Gui()
-    # while len(gui.current_screen):
-    #     gui.screen_select()
+    gui.current_screen.append(("screen_select_product", 1, 3))
+    while len(gui.current_screen):
+        gui.screen_select()
     pass

@@ -225,7 +225,7 @@ class Database():
         else:
             return False
 
-    def get_product(self, product_id, offset=0):
+    def get_product(self, product_id):
         """Return 9 random product from a product type.
         
         Args:
@@ -233,18 +233,25 @@ class Database():
         Returns:
 
         """
-        self.cursor.execute(
-            """SELECT id, product_name, brands, quantity 
+        query ="""SELECT id, product_name, brands, quantity 
             FROM `OffData` 
             WHERE product_id={} 
-            ORDER BY RAND()
-            LIMIT 9 OFFSET {}""".format(str(product_id), offset))
+            ORDER BY RAND()""".format(str(product_id))
+        self.cursor.execute(query)
         result = self.cursor.fetchall()
         if len(result):
-            self.random_result = result
+            self.random_result = self.cut_nine_list(result)
             return self.random_result
         else:
             return False
+    
+    @staticmethod
+    def cut_nine_list(cut_list):
+        nine_list = list()
+        while len(cut_list):
+            nine_list.append(cut_list[:9])
+            del(cut_list[:9])
+        return nine_list
 
     def show_product(self, off_id):
         """Return product details.
