@@ -4,6 +4,7 @@ title Diagrame de cas d'utilisation "GUI"
 package GUI{
     left to right direction
     (Choisir une catégorie) as SELECT_CTG
+    (Choisir un produit) as SELECT_PRODUCT
     (Trouver un substitut) as FIND_SUBST
     (Enregistrer un substitut) AS SET_SUBST
     (Consulter la liste des substituts) as SHOW_FAV
@@ -13,6 +14,7 @@ package GUI{
 actor user
 
 user -- SELECT_CTG
+user -- SELECT_PRODUCT
 user -- FIND_SUBST
 user -- SET_SUBST
 user -- SHOW_FAV
