@@ -46,17 +46,16 @@ https://trello.com/b/NFvfd67Q/ocdapythonpr5
 *Ecrire le modèle physique de données*
 
 catégories:
-* petit dejeuner
-    * pate a tartiner
-    * sandwich
-    * fromage
-    * biscuits
-    * compotes
-    * pizza
-    * choucroute
-    * ravioli
-    * creme chocolat
-    * yaourt aux fruits
+* pate a tartiner
+* sandwich
+* fromage
+* biscuits
+* compotes
+* pizza
+* choucroute
+* ravioli
+* creme chocolat
+* yaourt aux fruits
 
 * les données de OFF
 * les données sauvegardées par l'utilisateur
