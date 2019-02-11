@@ -1,37 +1,14 @@
 {
-    "petit dejeuner": [
-        "brioche",
-        "pate a tartiner",
-        "jus de fruit",
-        "Chocolats en poudre",
-        "laits"
-    ],
-    "dejeuner": [
-        "sandwich",
-        "salade",
-        "taboule",
-        "crudite",
-        "fromage"
-    ],
-    "gouter": [
-        "biscuits",
-        "compotes",
-        "crepes",
-        "viennoiseries",
-        "snacks sucres"
-    ],
-    "diner": [
-        "pizza",
-        "gratin",
+    "category":
+    [
         "choucroute",
+        "sandwich",
+        "fromage",
+        "crepe",
+        "compotes",
+        "pizza",
         "ravioli",
-        "lasagne"
-    ],
-    "dessert": [
         "creme chocolat",
-        "glaces",
-        "patisserie",
-        "yaourt aux fruits",
-        "puddings"
+        "yaourt aux fruits"
     ]
 }
