@@ -37,9 +37,14 @@ class Database():
         Else return None
         
         """
-        self.random_result = list()  # backup random list for pagination
-        self.substitute_proposition = list() # backup substitute proposition list for pagination
-        self.substitute_saved = list()  # backup substitute saved list pagination
+        self.pagination_list = {
+            "product": [],
+            "substitute": [],
+            "saved_substitute": []
+        }
+        # self.random_result = list()  # backup random list for pagination
+        # self.substitute_proposition = list() # backup substitute proposition list for pagination
+        # self.substitute_saved = list()  # backup substitute saved list pagination
 
         if self.create_connection():
             self.cursor = self.mydb.cursor()
@@ -251,8 +256,8 @@ class Database():
         self.cursor.execute(query)
         result = self.cursor.fetchall()
         if len(result):
-            self.random_result = self.cut_nine_list(result)
-            return self.random_result
+            self.pagination_list["product"] = self.cut_nine_list(result)
+            return True
         else:
             return False
     
@@ -261,8 +266,8 @@ class Database():
         next(self.cursor.execute(query, multi=True))  # multi return an iterator
         result = self.cursor.fetchall()
         if len(result):
-            self.substitute_proposition = self.cut_nine_list(result)
-            return self.substitute_proposition
+            self.pagination_list["substitute"] = self.cut_nine_list(result)
+            return True
         else:
             return False
 
@@ -282,9 +287,9 @@ class Database():
         else:
             return False
 
-    def show_substitute_detail(self, id_Substitute):
+    def show_substitute_detail(self, id_substitute):
         self.cursor.execute(
-            "SELECT origin_id, substitute_id FROM V_Substitute WHERE id = {}".format(id_Substitute)
+            "SELECT origin_id, substitute_id FROM V_Substitute WHERE id = {}".format(id_substitute)
             )
         return self.cursor.fetchall()
 
@@ -311,8 +316,8 @@ class Database():
         self.cursor.execute("SELECT * FROM V_Substitute")
         result = self.cursor.fetchall()
         if len(result):
-            self.substitute_saved = self.cut_nine_list(result)
-            return result
+            self.pagination_list["saved_substitute"] = self.cut_nine_list(result)
+            return True
         else:
             return False
 
