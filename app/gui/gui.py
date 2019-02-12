@@ -110,80 +110,78 @@ class Gui():
             except:
                 pass
 
+    def _print_product_list(self,product_list):
+        number = 0
+        for product in product_list:
+            number += 1
+            print("{} - {}".format(number, product[1]))
+
+    def _print_page(self, current_page, total_page):
+        page_text = []
+        if current_page is not 1: 
+            page_text.append("[P] <-- ")
+        page_text.append("page {}/{}".format(current_page, total_page))
+        if current_page is not total_page: 
+            page_text.append(" --> [N]")
+        print(" ".join(page_text))
+
+    def _change_page(self, max_page,  direction):
+        (screen, screen_id, page) = self.current_screen[-1]
+        max_page -= 1  # page is set from 0, not max_page
+
+        if direction.upper() == "N" and page < max_page:
+            self.current_screen[-1] = (screen, screen_id, page + 1)
+            return True
+        elif direction.upper() == "P" and page > 0:
+            self.current_screen[-1] = (screen, screen_id, page - 1)
+            return True
+        return False
+
+    def _answer(self, product_list, current_list, next_screen):
+        max_page = len(current_list)
+        print("\n0 - Retour")
+        answer = input("Votre choix : ")
+        try:
+            answer = int(answer)
+            if answer in range(len(product_list) + 1):
+                if answer == 0:
+                    self.current_screen.pop()
+                    current_list = []
+                else:
+                    self.current_screen.append((next_screen, product_list[answer - 1][0], 0))
+            return True
+        except:
+            self._change_page(max_page, answer)
+            return True
+        return False
+
     def screen_select_product(self, category_id, page):
         if not self.db.random_result:
             self.db.get_product(category_id)
+        max_page = len(self.db.random_result)
+        product_list = self.db.random_result[page]
         while True:
-            product_list = self.db.random_result[page]
-            number = 0
-            print("Selectionnez un produit:\n")
-            for product in product_list:
-                number += 1
-                print("{} - {}".format(number, product[1]))
-            print("page {}/{}".format(page+1, len(self.db.random_result)))
-            previous_page = ""
-            next_page = ""
-            if page is not 0: previous_page = "page précédente: p"
-            if page + 1 is not len(self.db.random_result): next_page = "page suivante: n"
-            print(previous_page + " - " + next_page)
-            print("\n0 - Retour")
-            answer = input("Votre choix : ")
-            try:
-                answer = int(answer)
-                if answer in range(len(product_list) + 1):
-                    if answer == 0:
-                        self.current_screen.pop()
-                        db.random_result = []
-                    else:
-                        self.current_screen.append(("screen_select_substitute", product_list[answer - 1][0], 0))
-                break
-            except:
-                if answer == "n" and next_page:
-                    self.current_screen[-1] = ("screen_select_product", category_id, page + 1)
-                    
-                elif answer == "p" and previous_page:
-                    self.current_screen[-1] = ("screen_select_product", category_id, page - 1)
-                    
+            print("Séléctionnez un produit :")
+            self._print_product_list(product_list)
+            self._print_page(page + 1, max_page)
+            if self._answer(product_list, self.db.random_result, "screen_select_substitute"):
                 break
 
     def screen_select_substitute(self, product_id, page):
         if not self.db.substitute_proposition:
             self.db.get_better_product(product_id)
+        max_page = len(self.db.substitute_proposition)
+        product_list = self.db.substitute_proposition[page]
         while True:
-            product_list = self.db.substitute_proposition[page]
-1            number = 0
-            print("Selectionnez un produit:\n")
-            for product in product_list:
-                number += 1
-                print("{} - {}".format(number, product[1]))
-            print("page {}/{}".format(page+1, len(self.db.random_result)))
-            previous_page = ""
-            next_page = ""
-            if page is not 0: previous_page = "page précédente: p"
-            if page + 1 is not len(self.db.random_result): next_page = "page suivante: n"
-            print(previous_page + " - " + next_page)
-            print("\n0 - Retour")
-            answer = input("Votre choix : ")
-            try:
-                answer = int(answer)
-                if answer in range(len(product_list) + 1):
-                    if answer == 0:
-                        self.current_screen.pop()
-                        db.random_result = []
-                    else:
-                        self.current_screen.append(("screen_detail_substitute", product_list[answer - 1][0], 0))
-                break
-            except:
-                if answer == "n" and next_page:
-                    self.current_screen[-1] = ("screen_select_substitute", category_id, page + 1)
-                    
-                elif answer == "p" and previous_page:
-                    self.current_screen[-1] = ("screen_select_substitute", category_id, page - 1)
-                    
+            print("Sélectionnez un substitut :")
+            self._print_product_list(product_list)
+            self._print_page(page + 1, len(self.db.substitute_proposition))
+            if self._answer(product_list, self.db.substitute_proposition, "screen_detail_substitute"):
                 break
 
     def screen_detail_substitute(self, origin_id, subtitute_id):
         print("screen_detail_substitute")
+
         pass
 
     def screen_show_substitute_list(self):
