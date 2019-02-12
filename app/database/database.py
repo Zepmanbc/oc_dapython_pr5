@@ -38,7 +38,8 @@ class Database():
         
         """
         self.random_result = list()  # backup random list for pagination
-        self.substitute_proposition = list() # backup substitute list for pagination
+        self.substitute_proposition = list() # backup substitute proposition list for pagination
+        self.substitute_saved = list()  # backup substitute saved list pagination
 
         if self.create_connection():
             self.cursor = self.mydb.cursor()
@@ -273,7 +274,8 @@ class Database():
         Returns:
 
         """
-        self.cursor.execute("CALL `show_details`({}, {});".format(origin_id, product_id))
+        query = "CALL show_details ({}, {});".format(origin_id, product_id)
+        next(self.cursor.execute(query, multi=True))  # multi return an iterator
         result = self.cursor.fetchall()
         if len(result):
             return result
@@ -298,7 +300,7 @@ class Database():
         self.cursor.execute(("DELETE FROM `Substitute` WHERE `id` = {}").format(id))
         self.mydb.commit()
 
-    def get_substitute(self):
+    def get_substitute_saved(self):
         """Return the view V_favorite.
         
         Returns:
@@ -309,6 +311,7 @@ class Database():
         self.cursor.execute("SELECT * FROM V_Substitute")
         result = self.cursor.fetchall()
         if len(result):
+            self.substitute_saved = self.cut_nine_list(result)
             return result
         else:
             return False
@@ -317,12 +320,12 @@ if __name__ == "__main__":
     db = Database()
 
     """CREATE AND FILL IN"""
-    db.cursor.execute("DROP DATABASE IF EXISTS offdb;")
-    db.create_database()
-    db.fill_in_database()
+    # db.cursor.execute("DROP DATABASE IF EXISTS offdb;")
+    # db.create_database()
+    # db.fill_in_database()
 
     """TEST FUNCTIONS"""
-    print(db.get_product(1))
+    # print(db.get_product(1))
     # db.get_better_product(154)
     # db.get_category()
     # print(db.get_type_product(4))
@@ -336,4 +339,5 @@ if __name__ == "__main__":
     # db.set_substitute(33,64)
     # db.set_substitute(37,67)
     # print(db.show_substitute_detail(3))
+    print(db.show_product_detail(12,45))
     pass
