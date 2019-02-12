@@ -77,3 +77,18 @@ BEGIN
     ORDER BY `nutrition_grades`; 
 END
 --
+CREATE PROCEDURE show_details (IN p_origin_id INT, IN p_substitute_id INT)
+BEGIN
+    SELECT 
+    CONCAT(OD_origin.product_name," - ",OD_origin.brands, " - ", OD_origin.quantity) as origin_designation,
+    OD_origin.nutrition_grades as origin_grade,
+    CONCAT(OD_substitute.product_name," - ",OD_substitute.brands, " - ", OD_substitute.quantity) as substitute_designation,
+    OD_substitute.nutrition_grades as substitute_grade,
+    OD_substitute.url as url,
+    OD_substitute.stores as stores
+    FROM `Product` 
+    JOIN Product OD_origin ON OD_origin.id = p_origin_id
+    JOIN Product OD_substitute ON OD_substitute.id = p_substitute_id
+    LIMIT 1;
+END
+--
