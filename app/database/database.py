@@ -265,18 +265,15 @@ class Database():
         else:
             return False
 
-    def show_product(self, product_id):
+    def show_product_detail(self, origin_id, product_id):
         """Return product details.
         
         Args:
-            product_id (int): Product id
 
         Returns:
-            List [id, product_name, brands, quantity, stores, url, nutrition_grades, product_id]
-            False if SQL query return nothing.
 
         """
-        self.cursor.execute("SELECT * FROM `Product` WHERE id={}".format(str(product_id)))
+        self.cursor.execute("CALL `show_details`({}, {});".format(origin_id, product_id))
         result = self.cursor.fetchall()
         if len(result):
             return result
@@ -320,9 +317,9 @@ if __name__ == "__main__":
     db = Database()
 
     """CREATE AND FILL IN"""
-    # db.cursor.execute("DROP DATABASE IF EXISTS offdb;")
-    # db.create_database()
-    # db.fill_in_database()
+    db.cursor.execute("DROP DATABASE IF EXISTS offdb;")
+    db.create_database()
+    db.fill_in_database()
 
     """TEST FUNCTIONS"""
     print(db.get_product(1))
