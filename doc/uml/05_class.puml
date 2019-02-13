@@ -4,7 +4,6 @@ class GUI{
     --
     Select_category()
     Select_product()
-    Select_substitute()
     Save_substitute()
     Show_substitute()
     Delete_substitute()
