@@ -103,7 +103,8 @@ class Database():
         except FileNotFoundError:
             print("File not Found: {}".format(self.SQL_FILE))
         try:
-            toto = commande.split("--")
+            # toto = commande.split("--")
+            #voir pour refaire sans splitter
             for cmd in commande.split("--"):
                 self.cursor.execute(cmd)
         except mysql.connector.Error as err:
@@ -249,7 +250,13 @@ class Database():
         Returns:
 
         """
-        query ="""SELECT id, product_name, brands, quantity 
+        query ="""SELECT id, 
+            CONCAT(
+                UPPER(IFNULL(nutrition_grades, "X")), " : ",
+                product_name, " ",
+                brands, " ", 
+                quantity
+            ) as product
             FROM `Product` 
             WHERE Category_id={} 
             ORDER BY RAND()""".format(str(category_id))
@@ -324,8 +331,8 @@ if __name__ == "__main__":
     db = Database()
 
     """CREATE AND FILL IN"""
-    # db.cursor.execute("DROP DATABASE IF EXISTS offdb;")
-    # db.create_database()
+    db.cursor.execute("DROP DATABASE IF EXISTS offdb;")
+    db.create_database()
     # db.fill_in_database()
 
     """TEST FUNCTIONS"""

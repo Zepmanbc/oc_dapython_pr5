@@ -47,19 +47,26 @@ ALTER TABLE Substitute ADD UNIQUE(origin_id, substitute_id);
 CREATE VIEW V_Substitute AS
 SELECT 
 Substitute.id as id,
-Category.name as category,
-origin_id,
-CONCAT(OD_origin.product_name," - ",OD_origin.brands, " - ", OD_origin.quantity) as origin_designation,
-substitute_id,
-CONCAT(OD_substitute.product_name," - ",OD_substitute.brands, " - ", OD_substitute.quantity) as substitute_designation
-FROM `Substitute` 
+CONCAT(
+    Category.name, " - ",
+    UPPER(IFNULL(OD_origin.nutrition_grades, "X")), " : ",
+    OD_origin.product_name, " ", OD_origin.brands, " ", OD_origin.quantity,
+    " \-\-\> ",
+    UPPER(IFNULL(OD_substitute.nutrition_grades, "X")), " : ",
+    OD_substitute.product_name, " ", OD_substitute.brands, " ", OD_substitute.quantity
+    ) as products,
+    OD_origin.id as origin_id,
+    OD_substitute.id as substitute_id
+FROM Substitute 
 JOIN Product OD_origin ON origin_id = OD_origin.id
 JOIN Product OD_substitute ON substitute_id = OD_substitute.id
-JOIN Category ON Category.id = OD_origin.category_id;
+JOIN Category ON Category.id = OD_origin.category_id
 --
 CREATE PROCEDURE get_better_product (IN p_id_product INT) 
 BEGIN 
-    SELECT * FROM `Product` 
+    SELECT id,
+    CONCAT(UPPER(nutrition_grades), " : ", product_name, " ", brands, " ", quantity) as product 
+    FROM `Product` 
     WHERE category_id=(
         SELECT category_id FROM Product WHERE id = p_id_product
         )
@@ -77,10 +84,10 @@ END
 CREATE PROCEDURE show_details (IN p_origin_id INT, IN p_substitute_id INT)
 BEGIN
     SELECT 
-    CONCAT(OD_origin.product_name," - ",OD_origin.brands, " - ", OD_origin.quantity) as origin_designation,
-    OD_origin.nutrition_grades as origin_grade,
-    CONCAT(OD_substitute.product_name," - ",OD_substitute.brands, " - ", OD_substitute.quantity) as substitute_designation,
-    OD_substitute.nutrition_grades as substitute_grade,
+    CONCAT(OD_origin.product_name," ",OD_origin.brands, " ", OD_origin.quantity) as origin_designation,
+    UPPER(IFNULL(OD_origin.nutrition_grades, "X")) as origin_grade,
+    CONCAT(OD_substitute.product_name," ",OD_substitute.brands, " ", OD_substitute.quantity) as substitute_designation,
+    UPPER(IFNULL(OD_substitute.nutrition_grades, "X")) as substitute_grade,
     OD_substitute.url as url,
     OD_substitute.stores as stores,
     (SELECT id FROM Substitute WHERE origin_id = p_origin_id AND substitute_id = p_substitute_id) as substitute_exist

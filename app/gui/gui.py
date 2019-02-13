@@ -174,9 +174,9 @@ class Gui():
         (origin_designation, origin_grade, substitute_designation, substitute_grade, \
             url, stores, substitute_exist) = self.db.show_product_detail(origin_id, substitute_id)[0]
         print("Produit d'origine :\n    {}".format(origin_designation))
-        print("    nutrition grade : {}\n".format(origin_grade))
+        print("    nutrition grade : {}\n".format(origin_grade.upper()))
         print("Produit de substitution :\n    {}".format(substitute_designation))
-        print("    nutrition grade : {}".format(origin_grade))
+        print("    nutrition grade : {}".format(origin_grade.upper()))
         print("    magasins : {}".format(stores))
         print("    url : {}".format(url))
         print("\nRetour : 0")
@@ -222,7 +222,7 @@ class Gui():
             answer = int(answer)
             target_screen = "screen_detail_substitute"
             origin_id = product_list[answer - 1][2]
-            substitute_id = product_list[answer - 1][4]
+            substitute_id = product_list[answer - 1][3]
             self.current_screen.append((target_screen, origin_id, substitute_id))
 
     @staticmethod
