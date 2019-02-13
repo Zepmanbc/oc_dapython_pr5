@@ -74,9 +74,9 @@ class Gui():
         try:
             answer = int(answer)
             if answer == 1:
-                self.current_screen.append(("screen_select_category",))
+                self.current_screen.append(("screen_select_category", ))
             elif answer == 2:
-                self.current_screen.append(("screen_show_substitute_list", 0))
+                self.current_screen.append(("screen_show_substitute_list", 0, 0))
             elif answer == 0:
                 self.current_screen.pop()
         except:
@@ -149,7 +149,6 @@ class Gui():
             page = 0
             self.current_screen.append((target_screen, target_id, page))
         
-    
     def screen_select_substitute(self, origin_id, page):
         if not self.db.pagination_list["substitute"]:
             self.db.get_better_product(origin_id)
@@ -171,47 +170,53 @@ class Gui():
             target_id = product_list[answer - 1][0]
             self.current_screen.append((target_screen, origin_id, target_id))
 
-    def screen_detail_substitute(self, origin_id, subtitute_id):
-        print("screen_detail_substitute")
-        # detail = self.db.show_product_detail(origin_id, subtitute_id)
+    def screen_detail_substitute(self, origin_id, substitute_id):
         (origin_designation, origin_grade, substitute_designation, substitute_grade, \
-            url, stores) = self.db.show_product_detail(origin_id, subtitute_id)[0]
+            url, stores, substitute_exist) = self.db.show_product_detail(origin_id, substitute_id)[0]
         print("Produit d'origine :\n    {}".format(origin_designation))
         print("    nutrition grade : {}\n".format(origin_grade))
         print("Produit de substitution :\n    {}".format(substitute_designation))
         print("    nutrition grade : {}".format(origin_grade))
         print("    magasins : {}".format(stores))
         print("    url : {}".format(url))
+        print("\nRetour : 0")
+        if substitute_exist:
+            print("Combinaison existante, pour la supprimer : 1")
+        else:
+            print("Pour enregistrer la combinaisons : 1")
 
+        answer = input("\nVotre choix : ")
+        if answer == '0':
+            self.current_screen.pop()
+        elif answer == '1':
+            if substitute_exist:
+                self.db.delete_substitute(substitute_exist)
+            else:
+                self.db.set_substitute(origin_id, substitute_id)
         # ajouter le switch de sauvegarde
 
-    def screen_show_substitute_list(self, page):
-        if not self.db.substitute_saved:
-            self.db.get_substitute_saved()
-        max_page = len(self.db.substitute_saved)
-        if max_page:
-            product_list = self.db.substitute_saved[page]
-            print("Séléctionnez une combinaison :")
-            self._print_list(product_list)
-            self._print_page(page + 1, max_page)
-            # self._answer(product_list, self.db.substitute_saved, "get_substitute_saved",\
-            #     "screen_detail_substitute", )
+    def screen_show_substitute_list(self, dummy, page):
+        # if not self.db.pagination_list["saved_substitute"]:
+        self.db.get_substitute_saved()
+        max_page = len(self.db.pagination_list["saved_substitute"])
+        if page >= max_page : page = max_page - 1  # in case delete on a 1 element page
+        product_list = self.db.pagination_list["saved_substitute"][page]
+        print("Sélectionnez une combinaison :")
+        self._print_list(product_list)
+        self._print_page(page + 1, max_page)
 
-            print("\n0 - Retour")
-            answer = input("Votre choix : ")
-            try:
-                answer = int(answer)
-                if answer in range(len(product_list) + 1):
-                    if answer == 0:
-                        self.current_screen.pop()
-                        self.db.get_substitute_saved = []
-                    else:
-                        self.current_screen.append(("screen_detail_substitute", product_list[answer - 1][2], product_list[answer - 1][4]))
-            except:
-                self._change_page(max_page, answer)
-        else:
+        answer = input("\nVotre choix : ")
+        if answer.upper() in "NP":
+            self._change_page(max_page, answer)
+        elif answer == '0':
+            self.db.pagination_list["saved_substitute"].clear()
             self.current_screen.pop()
-            input("Il n'y a pas de produit de substitution sauvegardé\nAppuyez sur [Enter]...")
+        elif answer in "123456789":
+            answer = int(answer)
+            target_screen = "screen_detail_substitute"
+            origin_id = product_list[answer - 1][2]
+            substitute_id = product_list[answer - 1][4]
+            self.current_screen.append((target_screen, origin_id, substitute_id))
 
     @staticmethod
     def clear():

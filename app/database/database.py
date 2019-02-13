@@ -262,17 +262,7 @@ class Database():
             return False
     
     def get_better_product(self, product_id):
-        # query = "CALL get_better_product({})".format(product_id)
-        # next(cursor.execute(query, multi=True))  # multi return an iterator
-        # result = cursor.fetchall()
-
-        # for toto in self.cursor.execute(query, multi=True):  # multi return an iterator
-        #     result = self.cursor.fetchall()
-        #     print(result)
-
         self.cursor.callproc("get_better_product", (product_id, ))
-        # for buffer in self.cursor.stored_results():
-        #     result = buffer.fetchall()
         result = next(self.cursor.stored_results()).fetchall()
 
         if len(result):
@@ -290,21 +280,7 @@ class Database():
 
         """
         self.cursor.callproc("show_details", (origin_id, product_id))
-        # for buffer in self.cursor.stored_results():
-        #     result = buffer.fetchall()
         result = next(self.cursor.stored_results()).fetchall()
-        # query = "CALL show_details ({}, {});".format(origin_id, product_id)
-        # next(self.cursor.execute(query, multi=True))  # multi return an iterator
-        # result = self.cursor.fetchall()
-
-        # toto = self.cursor.callproc("show_details", (origin_id, product_id))
-        # for toto in self.cursor.execute(query, multi=True):  # multi return an iterator
-        #     print(toto.with_rows)
-        #     print(toto.statement)
-
-
-
-
         if len(result):
             return result
         else:
@@ -367,9 +343,10 @@ if __name__ == "__main__":
     # db.set_substitute(33,64)
     # db.set_substitute(37,67)
     # print(db.show_substitute_detail(3))
-    print(db.get_category())
-    print(db.get_product(3))
-    print(db.show_product_detail(12,45))
-    print(db.get_better_product(33))
-    print(db.show_product_detail(12,45))
+    # print(db.get_category())
+    # print(db.get_product(3))
+    # print(db.show_product_detail(12,45))
+    # print(db.get_better_product(33))
+    # print(db.show_product_detail(12,45))
+    print(db.get_substitute_saved())
     pass
