@@ -199,6 +199,11 @@ class Gui():
         # if not self.db.pagination_list["saved_substitute"]:
         self.db.get_substitute_saved()
         max_page = len(self.db.pagination_list["saved_substitute"])
+        if not max_page:
+            input("Pas de substitut enregistré\nAppuyez sur [Enter]...")
+            self.db.pagination_list["saved_substitute"].clear()
+            self.current_screen.pop()
+            return
         if page >= max_page : page = max_page - 1  # in case delete on a 1 element page
         product_list = self.db.pagination_list["saved_substitute"][page]
         print("Sélectionnez une combinaison :")
