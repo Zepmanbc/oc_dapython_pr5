@@ -42,8 +42,8 @@ ADD CONSTRAINT fk_origin_id FOREIGN KEY (origin_id) REFERENCES Product(id) ON DE
 ALTER TABLE Substitute
 ADD CONSTRAINT fk_substitute_id FOREIGN KEY (substitute_id) REFERENCES Product(id) ON DELETE CASCADE;
 --
-
-
+ALTER TABLE Substitute ADD UNIQUE(origin_id, substitute_id);
+--
 
 CREATE VIEW V_Substitute AS
 SELECT 
@@ -85,7 +85,8 @@ BEGIN
     CONCAT(OD_substitute.product_name," - ",OD_substitute.brands, " - ", OD_substitute.quantity) as substitute_designation,
     OD_substitute.nutrition_grades as substitute_grade,
     OD_substitute.url as url,
-    OD_substitute.stores as stores
+    OD_substitute.stores as stores,
+    (SELECT id FROM Substitute WHERE origin_id = p_origin_id AND substitute_id = p_substitute_id) as substitute_exist
     FROM `Product` 
     JOIN Product OD_origin ON OD_origin.id = p_origin_id
     JOIN Product OD_substitute ON OD_substitute.id = p_substitute_id
