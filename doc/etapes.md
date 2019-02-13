@@ -1,5 +1,3 @@
-retirer le type de produits et mettre juste une liste de produits avec de la pagination
-
 # Cahier des charges
 
 ## Description du parcours utilisateur
@@ -45,40 +43,56 @@ https://trello.com/b/NFvfd67Q/ocdapythonpr5
 
 *Ecrire le modèle physique de données*
 
-catégories:
-* pate a tartiner
-* sandwich
-* fromage
-* biscuits
-* compotes
-* pizza
-* choucroute
-* ravioli
-* creme chocolat
-* yaourt aux fruits
+[Document de conception fonctionnelle](conception_fonctionnelle.md)
 
-* les données de OFF
-* les données sauvegardées par l'utilisateur
-
-database.png
-
-
-*Avoir un script pour la création de la base*
+*Avoir un script pour la création de la base* 
+    
+intégré dans le module database
+    
+>    create_database()
+    
+>    fill_in_database()
 
 *Ecrire un script qui récupère les données de OFF pour les mettre dans notre base*
 
+intégré dans le module database
+
+>   fill_in_database()
+
+>   _fill_with_off_data()
+
 ## 3 - Construire le programme
 
-*Lister les fonctionnalitées,faire un diagramme de classe*
+https://github.com/Zepmanbc/oc_dapython_pr5
 
 ## 4 - Intéragir avec la base de données
 
-*Ecrire les requetes*
+Les requêtes sont dans le module *database*
 
-*Ecrire la structure du programme*
+la gestion des fenêtres sont dans le module *gui*
 
 # difficultés rencontrées
 
-structure du main pour la logique de sequencage des fenetres
+###Structure du main pour la logique de sequençage des fenêtres
 
-faire les différents raises pour les erreurs de la DB
+La fenêtre de détail du substitut pouvant arriver par 2 chemins possible, je ne pouvais pas savoir quel était la fenêtre précédente (la liste des substituts proposé ou la kiste des substituts sauvegardés). J'ai donc décidé de passer par une liste *current_screen* afin d'empiler les fenetres. La feêtre active étant la dernière, elle est "dépilée" quand on revient en arrière.
+
+Cette méthode me permet également de revenir à la page sur laquelle l'utilisateur se situait avant dans passer à l'écran suivant.
+
+Si l'on souhaite rajouter des fonctionnalités, il sera également possible de "dépiler" toutes les fenetres pour revenir à la page d'accueil.
+
+### l'appel des procédures qui faisait planter le cursor
+
+J'ai choisi d'utiliser des procédures pour les requetes un peu plus "complexes" que juste l'intérogation d'une table.
+
+J'ai une procédure *get_better_product* qui me permet uniquement à partir du product_id de récuperer la catégorie et le grade du produit d'originet et de faire une recherche sur ces éléments. Cette procédure faisant appel à des requêtes imbriqué, le retour dans le curseur est un itérable. J'ai mis du temps à m'en rendre compte...
+
+la seconde procédure *show_detail* permet une double requête sur les éléments et de vérifier si le binôme existe déjà dans la table Substitute.
+
+J'ai également eu recours à une vue *V_Substitute* pour me simplifier le résultat de la liste des substituts sauvegardés.
+
+### Gestion des pages et de l'ordre des éléments
+
+l'affichage des produits doit être affiché aléatoirement mais le passage d'une page à l'autre ne peut pas relancer une requete aléatoire, on risque de ne jamais retrouver un produit. J'ai donc opté pour enregistrer le résultat de la requete aléatoire dans une liste découpé par page de 9 produits.
+
+La gestion des listes de produits, de substituts et de substituts sauvegardé sont géré de la même manière avec une liste. Celle ci est vidée lorsque l'on revient en arrière dans l'interface.
