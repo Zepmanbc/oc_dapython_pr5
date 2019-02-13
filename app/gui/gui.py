@@ -37,7 +37,7 @@ class Gui():
             "screen_select_product": self.screen_select_product,
             "screen_select_substitute": self.screen_select_substitute,
             "screen_detail_substitute": self.screen_detail_substitute,
-            "screen_show_substitute_list": self.screen_show_substitute_list
+            "screen_show_substitute_saved": self.screen_show_substitute_saved
         }
         self.db = Database()
         
@@ -76,7 +76,7 @@ class Gui():
             if answer == 1:
                 self.current_screen.append(("screen_select_category", ))
             elif answer == 2:
-                self.current_screen.append(("screen_show_substitute_list", 0, 0))
+                self.current_screen.append(("screen_show_substitute_saved", 0, 0))
             elif answer == 0:
                 self.current_screen.pop()
         except:
@@ -195,8 +195,9 @@ class Gui():
                 self.db.set_substitute(origin_id, substitute_id)
         # ajouter le switch de sauvegarde
 
-    def screen_show_substitute_list(self, dummy, page):
+    def screen_show_substitute_saved(self, dummy, page):
         # if not self.db.pagination_list["saved_substitute"]:
+        self.db.pagination_list["saved_substitute"].clear()
         self.db.get_substitute_saved()
         max_page = len(self.db.pagination_list["saved_substitute"])
         if not max_page:
@@ -210,6 +211,7 @@ class Gui():
         self._print_list(product_list)
         self._print_page(page + 1, max_page)
 
+        print("\nRetour : 0")
         answer = input("\nVotre choix : ")
         if answer.upper() in "NP":
             self._change_page(max_page, answer)

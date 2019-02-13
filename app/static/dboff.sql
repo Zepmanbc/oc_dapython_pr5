@@ -44,7 +44,6 @@ ADD CONSTRAINT fk_substitute_id FOREIGN KEY (substitute_id) REFERENCES Product(i
 --
 ALTER TABLE Substitute ADD UNIQUE(origin_id, substitute_id);
 --
-
 CREATE VIEW V_Substitute AS
 SELECT 
 Substitute.id as id,
@@ -58,8 +57,6 @@ JOIN Product OD_origin ON origin_id = OD_origin.id
 JOIN Product OD_substitute ON substitute_id = OD_substitute.id
 JOIN Category ON Category.id = OD_origin.category_id;
 --
-
-
 CREATE PROCEDURE get_better_product (IN p_id_product INT) 
 BEGIN 
     SELECT * FROM `Product` 
