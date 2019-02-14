@@ -26,7 +26,7 @@ class Gui():
 
     """
 
-    def __init__(self):
+    def __init__(self, dbconnect):
         """Initialise the Database and print intro screen.
 
         If Database doesn't exist, create and fill it.
@@ -39,7 +39,7 @@ class Gui():
             "screen_detail_substitute": self.screen_detail_substitute,
             "screen_show_substitute_saved": self.screen_show_substitute_saved
         }
-        self.db = Database()
+        self.db = Database(dbconnect)
         
         # if not self.db.mydb:
         if not self.db.mydb:
@@ -232,7 +232,9 @@ class Gui():
             os.system('clear')
 
 if __name__ == "__main__":
-    gui = Gui()
+    sys.path.append('.')
+    import config
+    gui = Gui(config.dbconnect)
     # gui.current_screen.append(("screen_select_product", 1, 0))
     # gui.clear()
     # gui.screen_detail_substitute(12,34)

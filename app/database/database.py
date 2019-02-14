@@ -22,21 +22,22 @@ class Database():
 
     """
 
-    QUANTITY_PRODUCTS = 200
-    HOST = "localhost"
-    USER = "root"
-    PASSWD ="root"
-    DATABASE = "offdb"
-    SQL_FILE = "app/static/dboff.sql"
-    STRUCTURE = "app/static/categories.json"
-
-    def __init__(self):
+    def __init__(self, dbconnect):
         """Initialyse the connection.
         
         If connection is ok, create th cursor
         Else return None
         
         """
+
+        self.QUANTITY_PRODUCTS = dbconnect["QUANTITY_PRODUCTS"]
+        self.HOST = dbconnect["HOST"]
+        self.USER = dbconnect["USER"]
+        self.PASSWD = dbconnect["PASSWD"]
+        self.DATABASE = dbconnect["DATABASE"]
+        self.SQL_FILE = dbconnect["SQL_FILE"]
+        self.STRUCTURE = dbconnect["STRUCTURE"]
+
         self.pagination_list = {
             "product": [],
             "substitute": [],
@@ -343,11 +344,14 @@ class Database():
             return False
 
 if __name__ == "__main__":
-    db = Database()
+    import sys
+    sys.path.append('.')
+    import config
+    db = Database(config.dbconnect)
 
     """CREATE AND FILL IN"""
-    db.cursor.execute("DROP DATABASE IF EXISTS offdb;")
-    db.create_database()
+    # db.cursor.execute("DROP DATABASE IF EXISTS offdb;")
+    # db.create_database()
     # db.fill_in_database()
 
     """TEST FUNCTIONS"""
@@ -370,5 +374,5 @@ if __name__ == "__main__":
     # print(db.show_product_detail(12,45))
     # print(db.get_better_product(33))
     # print(db.show_product_detail(12,45))
-    print(db.get_substitute_saved())
+    # print(db.get_substitute_saved())
     pass
