@@ -1,21 +1,24 @@
 #! /usr/bin/env python3
 """Create offdb in MySQL and fill it with data from OpenFoodFacts."""
 
-import mysql.connector
 import json
+import mysql.connector
 import requests
+
 
 class Database():
     """Create the Database.
 
     Set for a MySQL Database.
 
-    Change config.py to set connection configuration (HOST, USER, PASSWD, DATABASE)
+    Change config.py to set connection configuration
+    (HOST, USER, PASSWD, DATABASE)
 
     initialyse the database with:
         db = Database(configuration_dict)
         db.create() => read SQL_FILE to create the database, tables, and a view
-        db.fill_in_database() => read STRUCTURE to fill in TABLES and ask OpenFoodFacts
+        db.fill_in_database() => read STRUCTURE to fill in TABLES
+                                and ask OpenFoodFacts
 
     change QUANTITY_PRODUCTS to set max product recorded for a product_type
     if 0, no limit, step of 200
@@ -24,10 +27,10 @@ class Database():
 
     def __init__(self, dbconnect):
         """Initialyse the connection.
-        
+
         Args:
             dbconnect (dict): configuration
-        
+
         If connection is not ok, set mydb to False
         """
         self.QUANTITY_PRODUCTS = dbconnect["QUANTITY_PRODUCTS"]
@@ -49,7 +52,7 @@ class Database():
 
     def create_connection(self):
         """Test MySQL connection.
-        
+
         Return:
             Boolean
             console print OK or error message.
@@ -74,12 +77,12 @@ class Database():
 
     def create_database(self):
         """Read the SQL file and create the database and tables.
-        
+
         SQL_FILE (str): path to a sql file command.
 
-        Creates DATABASE, TABLES, VIEW, PROCEDURE. 
+        Creates DATABASE, TABLES, VIEW, PROCEDURE.
         Only the structure.
-        
+
         """
         try:
             self.mydb = mysql.connector.connect(
@@ -100,17 +103,15 @@ class Database():
         except FileNotFoundError:
             print("File not Found: {}".format(self.SQL_FILE))
         try:
-            # toto = commande.split("--")
-            #voir pour refaire sans splitter
             for cmd in commande.split("--"):
                 self.cursor.execute(cmd)
         except mysql.connector.Error as err:
             print(err)
         self.cursor.close()
-        
+
     def fill_in_database(self):
         """Import the categories/products from the json and fill the db.
-        
+
         STRUCTURE (str): path to a json file
             {category:[product_type1, ... ], ... }
 
@@ -120,10 +121,10 @@ class Database():
         except AttributeError:
             print("Need to create offdb")
             return None
-        
+
         with open(self.STRUCTURE) as _file:
             category_list = json.load(_file)
-        
+
         for category in category_list["category"]:
             sql = "INSERT INTO `Category` (`name`) VALUES (%s);"
             val = (category, )
@@ -132,26 +133,28 @@ class Database():
             category_id = self.cursor.lastrowid
             self._fill_with_off_data(category, category_id)
         self.cursor.close()
-    
+
     def _fill_with_off_data(self, category, category_id):
         """Fill the DB with OFF data for each product type.
 
         Args:
             category (str): name of the category for the search
             category_id (int): store id of Category
-        
+
         """
         print("Get \"{}\" items...".format(category))
         page = 1
         while True:
             _item = self._get_off_json(category, page)
-            if _item["products"] == []: break
+            if _item["products"] == []:
+                break
             qty_storing = (page - 1) * 200 + len(_item["products"])
             print("storing {}/{}...".format(qty_storing, _item["count"]))
             for info in _item["products"]:
                 info = self._clean_info(info)
                 sql = "INSERT INTO `Product` (`product_name`, \
-                        `brands`, `quantity`, `stores`, `url`, `nutrition_grades`, `category_id`)\
+                        `brands`, `quantity`, `stores`, `url`, \
+                            `nutrition_grades`, `category_id`)\
                         VALUES (%s, %s, %s, %s, %s, %s, %s)"
                 val = (
                     info["product_name"],
@@ -164,34 +167,42 @@ class Database():
                 self.cursor.execute(sql, val)
                 self.mydb.commit()
             page += 1
-            if qty_storing >= self.QUANTITY_PRODUCTS & self.QUANTITY_PRODUCTS != 0: break
+            if qty_storing >= self.QUANTITY_PRODUCTS & self.QUANTITY_PRODUCTS != 0:
+                break
         print("done")
-    
+
     @staticmethod
     def _clean_info(info):
         r"""Test OFF data if all fields exists, or create missing fields.
 
         Also replace \n with _
-        
+
         Args:
             info (dict): one product data from OpenFoodFacts
 
         Returns:
-            dict : with these keys "product_name", "brands", "quantity", "stores", "url"
+            dict : with these keys
+                    "product_name",
+                    "brands",
+                    "quantity",
+                    "stores",
+                    "url"
 
         """
         for item in ["product_name", "brands", "quantity", "stores", "url"]:
-            try:
-                info[item]
-            except:
+            if item not in info.keys():
                 info[item] = ''
+            # try:
+            #     info[item]
+            # except:
+            #     info[item] = ''
             # Clean data
             info[item] = info[item].replace('\n', '_')
         if info["nutrition_grades_tags"][0] not in ["a", "b", "c", "d", "e"]:
             info["nutrition_grades_tags"][0] = None
 
         return info
-    
+
     def _get_off_json(self, item, page):
         """Get data from OFF API.
 
@@ -203,7 +214,7 @@ class Database():
 
         Return:
             json : list of product type
-        
+
         """
         link = """https://fr.openfoodfacts.org/cgi/search.pl?action=process&search_terms={}
         &page_size=200&action=display&page={}&json=1""".format(item, page)
@@ -215,10 +226,10 @@ class Database():
 
     def get_category(self):
         """Get all the catégories.
-        
+
         Returns:
             List ['category1', 'category2', ...]
-        
+
         """
         self.cursor = self.mydb.cursor()
         self.cursor.execute("SELECT * FROM Category")
@@ -245,12 +256,12 @@ class Database():
 
     def get_product(self, category_id):
         """Return a list of 9 randomly products list from a category.
-        
+
         Args:
             category_id (int): id from Category TABLE
 
         Returns:
-            list: 
+            list:
             [
                 [
                     [id, designation]
@@ -264,15 +275,15 @@ class Database():
 
         """
         self.cursor = self.mydb.cursor()
-        query ="""SELECT id, 
+        query = """SELECT id,
             CONCAT(
                 UPPER(IFNULL(nutrition_grades, "X")), " : ",
                 product_name, " ",
-                brands, " ", 
+                brands, " ",
                 quantity
             ) as product
-            FROM `Product` 
-            WHERE Category_id={} 
+            FROM `Product`
+            WHERE Category_id={}
             ORDER BY RAND()""".format(str(category_id))
         self.cursor.execute(query)
         result = self.cursor.fetchall()
@@ -282,10 +293,10 @@ class Database():
             return True
         else:
             return False
-    
+
     def get_better_product(self, product_id):
         """Return a list of substitutes for a product.
-        
+
         Return a list of 9 products list from the same category,
         with at least the same nutrition grade
         ordered by nutrition grade (A>B>C>D)
@@ -295,7 +306,7 @@ class Database():
             product_id (int): id of origin product.
 
         Returns:
-            list: 
+            list:
             [
                 [
                     [id, designation]
@@ -320,7 +331,7 @@ class Database():
 
     def show_product_detail(self, origin_id, substitute_id):
         """Return product details.
-        
+
         Call PROCEDURE show_details
 
         Args:
@@ -360,9 +371,9 @@ class Database():
         """
         self.cursor = self.mydb.cursor()
         self.cursor.execute(
-            """INSERT INTO Substitute 
-            (origin_id, substitute_id) 
-            VALUES 
+            """INSERT INTO Substitute
+            (origin_id, substitute_id)
+            VALUES
             ('{}', '{}');""".format(origin_id, substitute_id))
         self.cursor.close()
         self.mydb.commit()
@@ -383,12 +394,14 @@ class Database():
 
     def get_substitute_saved(self):
         """Return the view V_favorite.
-        
+
         Returns:
             List [
-                id,  
-                products, => full designation 
-                        (category, nutrition grades, origin and substitute product)
+                id,
+                products, => full designation
+                        (category,
+                        nutrition grades,
+                        origin and substitute product)
                 origin_id,
                 substitute_id
                 ]
@@ -405,13 +418,14 @@ class Database():
         else:
             return False
 
+
 if __name__ == "__main__":
     # import sys
     # sys.path.append('.')
     # import config
     # db = Database(config.dbconnect)
 
-    """CREATE AND FILL IN"""
+    # """CREATE AND FILL IN"""
     # db.cursor = db.mydb.cursor()
     # db.cursor.execute("DROP DATABASE IF EXISTS offdb;")
     # db.create_database()
