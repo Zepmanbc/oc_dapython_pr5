@@ -10,12 +10,12 @@ class Database():
 
     Set for a MySQL Database.
 
-    Change global variables to set connection configuration (HOST, USER, PASSWD)
+    Change config.py to set connection configuration (HOST, USER, PASSWD, DATABASE)
 
     initialyse the database with:
-        db = Database()
+        db = Database(configuration_dict)
         db.create() => read SQL_FILE to create the database, tables, and a view
-        db.import_categories() => read STRUCTURE to fill in TABLES and ask OpenFoodFacts
+        db.fill_in_database() => read STRUCTURE to fill in TABLES and ask OpenFoodFacts
 
     change QUANTITY_PRODUCTS to set max product recorded for a product_type
     if 0, no limit, step of 200
@@ -25,11 +25,11 @@ class Database():
     def __init__(self, dbconnect):
         """Initialyse the connection.
         
-        If connection is ok, create th cursor
-        Else return None
+        Args:
+            dbconnect (dict): configuration
         
+        If connection is not ok, set mydb to False
         """
-
         self.QUANTITY_PRODUCTS = dbconnect["QUANTITY_PRODUCTS"]
         self.HOST = dbconnect["HOST"]
         self.USER = dbconnect["USER"]
@@ -77,7 +77,8 @@ class Database():
         
         SQL_FILE (str): path to a sql file command.
 
-        Creates DATABASE, TABLES, VIEW
+        Creates DATABASE, TABLES, VIEW, PROCEDURE. 
+        Only the structure.
         
         """
         try:
@@ -138,7 +139,6 @@ class Database():
         Args:
             category (str): name of the category for the search
             category_id (int): store id of Category
-
         
         """
         print("Get \"{}\" items...".format(category))
@@ -244,11 +244,23 @@ class Database():
         return nine_list
 
     def get_product(self, category_id):
-        """Return list of 9 randomly product from a category.
+        """Return a list of 9 randomly products list from a category.
         
         Args:
+            category_id (int): id from Category TABLE
 
         Returns:
+            list: 
+            [
+                [
+                    [id, designation]
+                    ...
+                    [id, designation]
+                ]
+                [ 9 Products List ]
+                [ 9 Products List ]
+                ...
+            ]
 
         """
         self.cursor = self.mydb.cursor()
@@ -272,6 +284,30 @@ class Database():
             return False
     
     def get_better_product(self, product_id):
+        """Return a list of substitutes for a product.
+        
+        Return a list of 9 products list from the same category,
+        with at least the same nutrition grade
+        ordered by nutrition grade (A>B>C>D)
+        does not return nutrition grade less products
+
+        Args:
+            product_id (int): id of origin product.
+
+        Returns:
+            list: 
+            [
+                [
+                    [id, designation]
+                    ...
+                    [id, designation]
+                ]
+                [ 9 Products List ]
+                [ 9 Products List ]
+                ...
+            ]
+
+        """
         self.cursor = self.mydb.cursor()
         self.cursor.callproc("get_better_product", (product_id, ))
         result = next(self.cursor.stored_results()).fetchall()
@@ -282,16 +318,29 @@ class Database():
         else:
             return False
 
-    def show_product_detail(self, origin_id, product_id):
+    def show_product_detail(self, origin_id, substitute_id):
         """Return product details.
         
+        Call PROCEDURE show_details
+
         Args:
+            origin_id (int): id fron origin product
+            substitute_id (int): id from substitute product
 
         Returns:
+            list:[
+                    origin_designation
+                    origin_grade
+                    substitute_designation
+                    substitute_grade
+                    url
+                    stores
+                    substitute_exist : return id od Substitute TABLE or NULL
+                ]
 
         """
         self.cursor = self.mydb.cursor()
-        self.cursor.callproc("show_details", (origin_id, product_id))
+        self.cursor.callproc("show_details", (origin_id, substitute_id))
         result = next(self.cursor.stored_results()).fetchall()
         self.cursor.close()
         if len(result):
@@ -299,27 +348,34 @@ class Database():
         else:
             return False
 
-    def show_substitute_detail(self, id_substitute):
-        self.cursor = self.mydb.cursor()
-        self.cursor.execute(
-            "SELECT origin_id, substitute_id FROM V_Substitute WHERE id = {}".format(id_substitute)
-            )
-        result = self.cursor.fetchall()
-        self.cursor.close()
-        return result
-
     def set_substitute(self, origin_id, substitute_id):
+        """Save a combinaison of 2 products Origin and Substitute.
+
+        INSERT in Substitute TABLE
+
+        Args:
+            origin_id (int): id fron origin product
+            substitute_id (int): id fron substitute product
+
+        """
         self.cursor = self.mydb.cursor()
         self.cursor.execute(
-            """INSERT INTO `Substitute` 
-            (`origin_id`, `substitute_id`) 
+            """INSERT INTO Substitute 
+            (origin_id, substitute_id) 
             VALUES 
             ('{}', '{}');""".format(origin_id, substitute_id))
         self.cursor.close()
         self.mydb.commit()
 
-
     def delete_substitute(self, id):
+        """Delete a combinaison of Origin and Substitute product.
+
+        DELETE data on Substitute TABLE
+
+        Args:
+            id (int): id of Substitute TABLE
+
+        """
         self.cursor = self.mydb.cursor()
         self.cursor.execute(("DELETE FROM `Substitute` WHERE `id` = {}").format(id))
         self.cursor.close()
@@ -329,7 +385,13 @@ class Database():
         """Return the view V_favorite.
         
         Returns:
-            List [off_id, category_name, product_type, product_name, brands, quantity]
+            List [
+                id,  
+                products, => full designation 
+                        (category, nutrition grades, origin and substitute product)
+                origin_id,
+                substitute_id
+                ]
             False if SQL query return nothing.
 
         """
@@ -344,12 +406,13 @@ class Database():
             return False
 
 if __name__ == "__main__":
-    import sys
-    sys.path.append('.')
-    import config
-    db = Database(config.dbconnect)
+    # import sys
+    # sys.path.append('.')
+    # import config
+    # db = Database(config.dbconnect)
 
     """CREATE AND FILL IN"""
+    # db.cursor = db.mydb.cursor()
     # db.cursor.execute("DROP DATABASE IF EXISTS offdb;")
     # db.create_database()
     # db.fill_in_database()
