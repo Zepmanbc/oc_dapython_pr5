@@ -48,6 +48,20 @@ password is "root"
 
 Now you got a full running LAMP server running in docker.
 
+# Configure Database
+
+Modify `config.py` file (this configuration is default for the LAMP docker version described before)
+
+    "QUANTITY_PRODUCTS" : 200,
+    "HOST" : "localhost",
+    "USER" : "root",
+    "PASSWD" :"root",
+    "DATABASE" : "offdb",
+    "SQL_FILE" : "app/static/dboff.sql",
+    "STRUCTURE" : "app/static/categories.json"
+
+QUANTITY_PRODUCTS define the max downloaded products (step is 200), if it is set to 0, there is no limitation.
+
 # Run the software
 
 (I suppose your virtualenv is activated and LAMP is running)
@@ -56,7 +70,7 @@ Now you got a full running LAMP server running in docker.
 
 The first time you run it, the database (MySQL) will be created and be filled.
 
-## Search a product
+## Search a substitute
 
 You will have to select what you want to do
 
@@ -67,13 +81,13 @@ Press `1` and validate with `Enter`.
 
 Select your category and validate.
 
-Select your product type and validate.
+Select a product with the number, if you want to go back use `0`. Use `N` and `P` to navigate throw pages.
 
-Select a product with the number, if you want to go back use `0`.
+Select a substitute with the number, if you want to go back use `0`. Use `N` and `P` to navigate throw pages.
 
-if you want to save a product to your favorites, use `1`.
+if you want to save the combinaison, use `1`.
 
-# Show favorites
+## Show favorites
 
 On the main screen select `2`.
 

@@ -66,6 +66,8 @@ Une base MySQL et la console.
 
 ![Modèle Physique de donnée](img/06_MPD.png)
 
-[Script SQL](../app/static/dboff.sql)
+[Script SQL](https://raw.githubusercontent.com/Zepmanbc/oc_dapython_pr5/master/app/static/inject_dboff.sql)
+
+[Backup de la base de données](https://raw.githubusercontent.com/Zepmanbc/oc_dapython_pr5/master/doc/backup_offdb.sql)
 
 
