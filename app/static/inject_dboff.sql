@@ -62,6 +62,7 @@ JOIN Product OD_origin ON origin_id = OD_origin.id
 JOIN Product OD_substitute ON substitute_id = OD_substitute.id
 JOIN Category ON Category.id = OD_origin.category_id;
 --
+DELIMITER |
 CREATE PROCEDURE get_better_product (IN p_id_product INT) 
 BEGIN 
     SELECT id,
@@ -79,8 +80,10 @@ BEGIN
         )
     AND `nutrition_grades` <> ''
     ORDER BY `nutrition_grades`; 
-END
+END|
+DELIMITER ;
 --
+DELIMITER |
 CREATE PROCEDURE show_details (IN p_origin_id INT, IN p_substitute_id INT)
 BEGIN
     SELECT 
@@ -95,5 +98,6 @@ BEGIN
     JOIN Product OD_origin ON OD_origin.id = p_origin_id
     JOIN Product OD_substitute ON OD_substitute.id = p_substitute_id
     LIMIT 1;
-END
+END|
+DELIMITER ;
 --
