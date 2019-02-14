@@ -42,9 +42,7 @@ class Gui():
         self.db = Database()
         
         # if not self.db.mydb:
-        try:
-            self.db.cursor
-        except:
+        if not self.db.mydb:
             self.clear()
             print("Création de la base...")
             self.db.create_database()
@@ -176,7 +174,7 @@ class Gui():
         print("Produit d'origine :\n    {}".format(origin_designation))
         print("    nutrition grade : {}\n".format(origin_grade.upper()))
         print("Produit de substitution :\n    {}".format(substitute_designation))
-        print("    nutrition grade : {}".format(origin_grade.upper()))
+        print("    nutrition grade : {}".format(substitute_grade.upper()))
         print("    magasins : {}".format(stores))
         print("    url : {}".format(url))
         print("\nRetour : 0")
