@@ -42,13 +42,8 @@ class Database():
             "substitute": [],
             "saved_substitute": []
         }
-        # self.random_result = list()  # backup random list for pagination
-        # self.substitute_proposition = list() # backup substitute proposition list for pagination
-        # self.substitute_saved = list()  # backup substitute saved list pagination
 
-        if self.create_connection():
-            self.cursor = self.mydb.cursor()
-        else:
+        if not self.create_connection():
             self.mydb = False
 
     def create_connection(self):
@@ -109,6 +104,7 @@ class Database():
                 self.cursor.execute(cmd)
         except mysql.connector.Error as err:
             print(err)
+        self.cursor.close()
         
     def fill_in_database(self):
         """Import the categories/products from the json and fill the db.
@@ -118,7 +114,7 @@ class Database():
 
         """
         try:
-            self.cursor
+            self.cursor = self.mydb.cursor()
         except AttributeError:
             print("Need to create offdb")
             return None
@@ -133,6 +129,7 @@ class Database():
             self.mydb.commit()
             category_id = self.cursor.lastrowid
             self._fill_with_off_data(category, category_id)
+        self.cursor.close()
     
     def _fill_with_off_data(self, category, category_id):
         """Fill the DB with OFF data for each product type.
@@ -222,8 +219,11 @@ class Database():
             List ['category1', 'category2', ...]
         
         """
+        self.cursor = self.mydb.cursor()
         self.cursor.execute("SELECT * FROM Category")
-        return self.cursor.fetchall()
+        resutl = self.cursor.fetchall()
+        self.cursor.close()
+        return resutl
 
     @staticmethod
     def cut_nine_list(cut_list):
@@ -250,6 +250,7 @@ class Database():
         Returns:
 
         """
+        self.cursor = self.mydb.cursor()
         query ="""SELECT id, 
             CONCAT(
                 UPPER(IFNULL(nutrition_grades, "X")), " : ",
@@ -262,6 +263,7 @@ class Database():
             ORDER BY RAND()""".format(str(category_id))
         self.cursor.execute(query)
         result = self.cursor.fetchall()
+        self.cursor.close()
         if len(result):
             self.pagination_list["product"] = self.cut_nine_list(result)
             return True
@@ -269,9 +271,10 @@ class Database():
             return False
     
     def get_better_product(self, product_id):
+        self.cursor = self.mydb.cursor()
         self.cursor.callproc("get_better_product", (product_id, ))
         result = next(self.cursor.stored_results()).fetchall()
-
+        self.cursor.close()
         if len(result):
             self.pagination_list["substitute"] = self.cut_nine_list(result)
             return True
@@ -286,29 +289,39 @@ class Database():
         Returns:
 
         """
+        self.cursor = self.mydb.cursor()
         self.cursor.callproc("show_details", (origin_id, product_id))
         result = next(self.cursor.stored_results()).fetchall()
+        self.cursor.close()
         if len(result):
             return result
         else:
             return False
 
     def show_substitute_detail(self, id_substitute):
+        self.cursor = self.mydb.cursor()
         self.cursor.execute(
             "SELECT origin_id, substitute_id FROM V_Substitute WHERE id = {}".format(id_substitute)
             )
-        return self.cursor.fetchall()
+        result = self.cursor.fetchall()
+        self.cursor.close()
+        return result
 
     def set_substitute(self, origin_id, substitute_id):
+        self.cursor = self.mydb.cursor()
         self.cursor.execute(
             """INSERT INTO `Substitute` 
             (`origin_id`, `substitute_id`) 
             VALUES 
             ('{}', '{}');""".format(origin_id, substitute_id))
+        self.cursor.close()
         self.mydb.commit()
 
+
     def delete_substitute(self, id):
+        self.cursor = self.mydb.cursor()
         self.cursor.execute(("DELETE FROM `Substitute` WHERE `id` = {}").format(id))
+        self.cursor.close()
         self.mydb.commit()
 
     def get_substitute_saved(self):
@@ -319,8 +332,10 @@ class Database():
             False if SQL query return nothing.
 
         """
+        self.cursor = self.mydb.cursor()
         self.cursor.execute("SELECT * FROM V_Substitute")
         result = self.cursor.fetchall()
+        self.cursor.close()
         if len(result):
             self.pagination_list["saved_substitute"] = self.cut_nine_list(result)
             return True
