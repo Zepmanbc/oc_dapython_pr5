@@ -1,11 +1,11 @@
 #! /usr/bin/env python3
 """Interface for Pure Beurre."""
-
 import sys
 import os
 
 sys.path.append('app/')
 from database.database import Database
+
 
 class Gui():
     """Generate all the screens to navigate throught Pur Beurre software.
@@ -37,10 +37,10 @@ class Gui():
             "screen_select_product": self.screen_select_product,
             "screen_select_substitute": self.screen_select_substitute,
             "screen_detail_substitute": self.screen_detail_substitute,
-            "screen_show_substitute_saved": self.screen_show_substitute_saved
+            "screen_select_substitute_saved": self.screen_select_substitute_saved
         }
         self.db = Database(dbconnect)
-        
+
         # if not self.db.mydb:
         if not self.db.mydb:
             self.clear()
@@ -49,10 +49,10 @@ class Gui():
             print("Récupération des données en cours...")
             self.db.fill_in_database()
         self.current_screen = [("screen_intro",)]
-    
+
     def screen_select(self):
         """Display the last screen in current_screen.
-        
+
         screen item is a Tuple
         ("screen_name", *args)
         """
@@ -69,23 +69,21 @@ class Gui():
         0 - Quitter
         """)
         answer = input("Votre choix : ")
-        try:
+        if answer.isdigit():
             answer = int(answer)
             if answer == 1:
                 self.current_screen.append(("screen_select_category", ))
             elif answer == 2:
-                self.current_screen.append(("screen_show_substitute_saved", 0, 0))
+                self.current_screen.append(("screen_select_substitute_saved", 0, 0))
             elif answer == 0:
                 self.current_screen.pop()
-        except:
-            pass
 
     def screen_select_category(self):
         category_list = self.db.get_category()
         self._print_list(category_list)
         print("\n0 - Retour")
         answer = input("Votre choix : ")
-        try:
+        if answer.isdigit():
             answer = int(answer)
             if answer in range(len(category_list) + 1):
                 if answer == 0:
@@ -95,32 +93,32 @@ class Gui():
                     target_id = category_list[answer - 1][0]
                     page = 0
                     self.current_screen.append((target_screen, target_id, page))
-        except:
-            pass
 
-    def _print_list(self,product_list):
+    @staticmethod
+    def _print_list(product_list):
         number = 0
         for product in product_list:
             number += 1
             print("{} - {}".format(number, product[1]))
 
-    def _print_page(self, current_page, total_page):
+    @staticmethod
+    def _print_page(current_page, total_page):
         page_text = []
-        if current_page is not 1: 
+        if current_page is not 1:
             page_text.append("[P] <-- ")
         page_text.append("page {}/{}".format(current_page, total_page))
-        if current_page is not total_page: 
+        if current_page is not total_page:
             page_text.append(" --> [N]")
         print(" ".join(page_text))
 
-    def _change_page(self, max_page,  direction):
+    def _change_page(self, max_page, direction):
         (screen, screen_id, page) = self.current_screen[-1]
         max_page -= 1  # page is set from 0, not max_page
 
         if direction.upper() == "N" and page < max_page:
             self.current_screen[-1] = (screen, screen_id, page + 1)
             return True
-        elif direction.upper() == "P" and page > 0:
+        if direction.upper() == "P" and page > 0:
             self.current_screen[-1] = (screen, screen_id, page - 1)
             return True
         return False
@@ -151,7 +149,7 @@ class Gui():
             target_id = product_list[answer - 1][0]
             page = 0
             self.current_screen.append((target_screen, target_id, page))
-        
+
     def screen_select_substitute(self, origin_id, page):
         if not self.db.pagination_list["substitute"]:
             self.db.get_better_product(origin_id)
@@ -180,7 +178,8 @@ class Gui():
 
     def screen_detail_substitute(self, origin_id, substitute_id):
         (origin_designation, origin_grade, substitute_designation, substitute_grade, \
-            url, stores, substitute_exist) = self.db.show_product_detail(origin_id, substitute_id)[0]
+            url, stores, \
+            substitute_exist) = self.db.show_product_detail(origin_id, substitute_id)[0]
         print("Produit d'origine :\n    {}".format(origin_designation))
         print("    nutrition grade : {}\n".format(origin_grade.upper()))
         print("Produit de substitution :\n    {}".format(substitute_designation))
@@ -203,7 +202,7 @@ class Gui():
                 self.db.set_substitute(origin_id, substitute_id)
         # ajouter le switch de sauvegarde
 
-    def screen_show_substitute_saved(self, dummy, page):
+    def screen_select_substitute_saved(self, dummy, page):
         # if not self.db.pagination_list["saved_substitute"]:
         self.db.pagination_list["saved_substitute"].clear()
         self.db.get_substitute_saved()
@@ -213,7 +212,8 @@ class Gui():
             self.db.pagination_list["saved_substitute"].clear()
             self.current_screen.pop()
             return
-        if page >= max_page : page = max_page - 1  # in case delete on a 1 element page
+        if page >= max_page:
+            page = max_page - 1  # in case delete on a 1 element page
         product_list = self.db.pagination_list["saved_substitute"][page]
         print("Sélectionnez une combinaison :")
         self._print_list(product_list)
@@ -243,12 +243,11 @@ class Gui():
 
 if __name__ == "__main__":
     sys.path.append('.')
-    import config
-    gui = Gui(config.dbconnect)
+    # import config
+    # gui = Gui(config.dbconnect)
     # gui.current_screen.append(("screen_select_product", 1, 0))
     # gui.clear()
     # gui.screen_detail_substitute(12,34)
     # gui.current_screen.append(("screen_detail_substitute", 12 , 34))
-    while len(gui.current_screen):
-        gui.screen_select()
-    pass
+    # while gui.current_screen:
+    #     gui.screen_select()
