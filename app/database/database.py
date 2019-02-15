@@ -15,12 +15,12 @@ class Database():
     (HOST, USER, PASSWD, DATABASE)
 
     initialyse the database with:
-        db = Database(configuration_dict)
-        db.create() => read SQL_FILE to create the database, tables, and a view
-        db.fill_in_database() => read STRUCTURE to fill in TABLES
+        db = database(configuration_dict)
+        db.create() => read SQL_FLES to create the DATABASE, TABLES, VIEW and PROCEDURES
+        db.fill_in_database() => read structure to fill in TABLES
                                 and ask OpenFoodFacts
 
-    change QUANTITY_PRODUCTS to set max product recorded for a product_type
+    change quantity_products to set max product recorded for a product_type
     if 0, no limit, step of 200
 
     """
@@ -30,16 +30,20 @@ class Database():
 
         Args:
             dbconnect (dict): configuration
+                default:
+                    {
+                        "QUANTITY_PRODUCTS" : 200,
+                        "HOST" : "localhost",
+                        "USER" : "root",
+                        "PASSWD" :"root",
+                        "DATABASE" : "offdb",
+                        "SQL_FILE" : "app/static/dboff.sql",
+                        "STRUCTURE" : "app/static/categories.json"
+                    }
 
         If connection is not ok, set mydb to False
         """
-        self.QUANTITY_PRODUCTS = dbconnect["QUANTITY_PRODUCTS"]
-        self.HOST = dbconnect["HOST"]
-        self.USER = dbconnect["USER"]
-        self.PASSWD = dbconnect["PASSWD"]
-        self.DATABASE = dbconnect["DATABASE"]
-        self.SQL_FILE = dbconnect["SQL_FILE"]
-        self.STRUCTURE = dbconnect["STRUCTURE"]
+        self.dbconnect = dbconnect
 
         self.pagination_list = {
             "product": [],
@@ -49,6 +53,9 @@ class Database():
 
         if not self.create_connection():
             self.mydb = False
+        else:
+            self.cursor = self.mydb.cursor()  # just for init the variable in __init__
+            self.cursor.close()
 
     def create_connection(self):
         """Test MySQL connection.
@@ -60,10 +67,10 @@ class Database():
         """
         try:
             self.mydb = mysql.connector.connect(
-                host=self.HOST,
-                user=self.USER,
-                passwd=self.PASSWD,
-                database=self.DATABASE
+                host=self.dbconnect["HOST"],
+                user=self.dbconnect["USER"],
+                passwd=self.dbconnect["PASSWD"],
+                database=self.dbconnect["DATABASE"]
             )
             print("Connection OK")
             return True
@@ -78,7 +85,7 @@ class Database():
     def create_database(self):
         """Read the SQL file and create the database and tables.
 
-        SQL_FILE (str): path to a sql file command.
+        sql_file (str): path to a sql file command.
 
         Creates DATABASE, TABLES, VIEW, PROCEDURE.
         Only the structure.
@@ -86,9 +93,9 @@ class Database():
         """
         try:
             self.mydb = mysql.connector.connect(
-                host=self.HOST,
-                user=self.USER,
-                passwd=self.PASSWD,
+                host=self.dbconnect["HOST"],
+                user=self.dbconnect["USER"],
+                passwd=self.dbconnect["PASSWD"],
             )
             print("Connection OK")
         except mysql.connector.Error as err:
@@ -98,21 +105,22 @@ class Database():
         self.cursor = self.mydb.cursor()
         commande = ""
         try:
-            for line in open(self.SQL_FILE):
+            for line in open(self.dbconnect["SQL_FILE"]):
                 commande += line.replace('\n', ' ')
         except FileNotFoundError:
-            print("File not Found: {}".format(self.SQL_FILE))
+            print("File not Found: {}".format(self.dbconnect["SQL_FILE"]))
         try:
             for cmd in commande.split("--"):
                 self.cursor.execute(cmd)
         except mysql.connector.Error as err:
             print(err)
         self.cursor.close()
+        return True
 
     def fill_in_database(self):
         """Import the categories/products from the json and fill the db.
 
-        STRUCTURE (str): path to a json file
+        structure (str): path to a json file
             {category:[product_type1, ... ], ... }
 
         """
@@ -122,7 +130,7 @@ class Database():
             print("Need to create offdb")
             return None
 
-        with open(self.STRUCTURE) as _file:
+        with open(self.dbconnect["STRUCTURE"]) as _file:
             category_list = json.load(_file)
 
         for category in category_list["category"]:
@@ -133,6 +141,7 @@ class Database():
             category_id = self.cursor.lastrowid
             self._fill_with_off_data(category, category_id)
         self.cursor.close()
+        return True
 
     def _fill_with_off_data(self, category, category_id):
         """Fill the DB with OFF data for each product type.
@@ -167,7 +176,7 @@ class Database():
                 self.cursor.execute(sql, val)
                 self.mydb.commit()
             page += 1
-            if qty_storing >= self.QUANTITY_PRODUCTS & self.QUANTITY_PRODUCTS != 0:
+            if qty_storing >= self.dbconnect["QUANTITY_PRODUCTS"] & self.dbconnect["QUANTITY_PRODUCTS"] != 0:
                 break
         print("done")
 
@@ -203,7 +212,8 @@ class Database():
 
         return info
 
-    def _get_off_json(self, item, page):
+    @staticmethod
+    def _get_off_json(item, page):
         """Get data from OFF API.
 
         default quantity return 200/page
@@ -249,9 +259,9 @@ class Database():
 
         """
         nine_list = list()
-        while len(cut_list):
+        while cut_list:
             nine_list.append(cut_list[:9])
-            del(cut_list[:9])
+            del cut_list[:9]
         return nine_list
 
     def get_product(self, category_id):
@@ -288,11 +298,10 @@ class Database():
         self.cursor.execute(query)
         result = self.cursor.fetchall()
         self.cursor.close()
-        if len(result):
+        if result:
             self.pagination_list["product"] = self.cut_nine_list(result)
             return True
-        else:
-            return False
+        return False
 
     def get_better_product(self, product_id):
         """Return a list of substitutes for a product.
@@ -323,11 +332,10 @@ class Database():
         self.cursor.callproc("get_better_product", (product_id, ))
         result = next(self.cursor.stored_results()).fetchall()
         self.cursor.close()
-        if len(result):
+        if result:
             self.pagination_list["substitute"] = self.cut_nine_list(result)
             return True
-        else:
-            return False
+        return False
 
     def show_product_detail(self, origin_id, substitute_id):
         """Return product details.
@@ -354,10 +362,9 @@ class Database():
         self.cursor.callproc("show_details", (origin_id, substitute_id))
         result = next(self.cursor.stored_results()).fetchall()
         self.cursor.close()
-        if len(result):
+        if result:
             return result
-        else:
-            return False
+        return False
 
     def set_substitute(self, origin_id, substitute_id):
         """Save a combinaison of 2 products Origin and Substitute.
@@ -378,17 +385,17 @@ class Database():
         self.cursor.close()
         self.mydb.commit()
 
-    def delete_substitute(self, id):
+    def delete_substitute(self, substitute_id):
         """Delete a combinaison of Origin and Substitute product.
 
         DELETE data on Substitute TABLE
 
         Args:
-            id (int): id of Substitute TABLE
+            substitute_id (int): id of Substitute TABLE
 
         """
         self.cursor = self.mydb.cursor()
-        self.cursor.execute(("DELETE FROM `Substitute` WHERE `id` = {}").format(id))
+        self.cursor.execute(("DELETE FROM Substitute WHERE id = {}").format(substitute_id))
         self.cursor.close()
         self.mydb.commit()
 
@@ -412,16 +419,15 @@ class Database():
         self.cursor.execute("SELECT * FROM V_Substitute")
         result = self.cursor.fetchall()
         self.cursor.close()
-        if len(result):
+        if result:
             self.pagination_list["saved_substitute"] = self.cut_nine_list(result)
             return True
-        else:
-            return False
+        return False
 
 
 if __name__ == "__main__":
-    # import sys
-    # sys.path.append('.')
+    import sys
+    sys.path.append('.')
     # import config
     # db = Database(config.dbconnect)
 
@@ -431,7 +437,7 @@ if __name__ == "__main__":
     # db.create_database()
     # db.fill_in_database()
 
-    """TEST FUNCTIONS"""
+    # """TEST FUNCTIONS"""
     # print(db.get_product(1))
     # db.get_better_product(154)
     # db.get_category()
@@ -452,4 +458,3 @@ if __name__ == "__main__":
     # print(db.get_better_product(33))
     # print(db.show_product_detail(12,45))
     # print(db.get_substitute_saved())
-    pass
