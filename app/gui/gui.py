@@ -129,6 +129,11 @@ class Gui():
         if not self.db.pagination_list["product"]:
             self.db.get_product(category_id)
         max_page = len(self.db.pagination_list["product"])
+        if not max_page:
+            input("Pas de produits dans cette catégorie\nAppuyez sur [Enter]...")
+            self.db.pagination_list["product"].clear()
+            self.current_screen.pop()
+            return
         product_list = self.db.pagination_list["product"][page]
         print("Séléctionnez un produit :")
         self._print_list(product_list)
@@ -151,6 +156,11 @@ class Gui():
         if not self.db.pagination_list["substitute"]:
             self.db.get_better_product(origin_id)
         max_page = len(self.db.pagination_list["substitute"])
+        if not max_page:
+            input("Pas de substituts possible pour ce produit\nAppuyez sur [Enter]...")
+            self.db.pagination_list["substitute"].clear()
+            self.current_screen.pop()
+            return
         product_list = self.db.pagination_list["substitute"][page]
         print("Sélectionnez un substitut :")
         self._print_list(product_list)
