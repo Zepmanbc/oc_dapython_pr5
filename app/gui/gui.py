@@ -39,9 +39,9 @@ class Gui():
             "screen_detail_substitute": self.screen_detail_substitute,
             "screen_select_substitute_saved": self.screen_select_substitute_saved
         }
+
         self.db = Database(DBCONNECT)
 
-        # if not self.db.mydb:
         if not self.db.mydb:
             self.clear()
             print("Création de la base...")
@@ -79,6 +79,7 @@ class Gui():
                 self.current_screen.pop()
 
     def screen_select_category(self):
+        """Print list of categories."""
         category_list = self.db.get_category()
         self._print_list(category_list)
         print("\n0 - Retour")
@@ -96,6 +97,16 @@ class Gui():
 
     @staticmethod
     def _print_list(product_list):
+        """Format and print a list of items with a number in front.
+
+        Args:
+            product_list (list): [id, product_name, *]
+
+        Print:
+            number - product_name
+
+        """
+
         number = 0
         for product in product_list:
             number += 1
@@ -103,6 +114,19 @@ class Gui():
 
     @staticmethod
     def _print_page(current_page, total_page):
+        """Print the Page information.
+
+        Args:
+            current_page (int)
+            total_page (int)
+
+        Print:
+            [P] <-- Page current_page/totalpage --> [N]
+
+        [P]: P key for Previous
+        [N]: N key for Next
+
+        """
         page_text = []
         if current_page is not 1:
             page_text.append("[P] <-- ")
@@ -112,6 +136,17 @@ class Gui():
         print(" ".join(page_text))
 
     def _change_page(self, max_page, direction):
+        """Modify the page for tue list on the screen.
+
+        Modify le current screen (last item of current_screen list)
+        get the Page var and increase or decrease if possible
+        depending the [N] or [P] answer
+
+        Args:
+            max_page (int): the max available pages
+            direction (str): N or P
+
+        """
         (screen, screen_id, page) = self.current_screen[-1]
         max_page -= 1  # page is set from 0, not max_page
 
@@ -124,11 +159,25 @@ class Gui():
         return False
 
     def _screen_select_show(self, select_dict, id_query, page):
+        """Print the standard list page.
+
+        Args:
+            select_dict (dict)
+                pagination_list (str): name of the paginantion list from Database()
+                                       used for pages of list products
+                query (method): the method is called to fill pagination list
+                no_data_msg (str): text in case there is no data to print
+                select_msg (str): text to explain what is asked on current screen
+                target_screen (str): name of the next screen
+            id_query (int): id used in the database query
+            page (int): current page
+
+        """
         if select_dict["pagination_list"] == "saved_substitute":
             # refresh list of item have been deleted
             self.db.pagination_list[select_dict["pagination_list"]].clear()
             select_dict["query"]()
-        
+
         max_page = len(self.db.pagination_list[select_dict["pagination_list"]])
         if not max_page:  # means query return is empty
             input(select_dict["no_data_msg"] + "\nAppuyez sur [Enter]...")
@@ -137,13 +186,13 @@ class Gui():
             return
         if page >= max_page:
             page = max_page - 1  # in case delete on a 1 element page
-        
+
         # read the pagination list at the wanted page
         product_list = self.db.pagination_list[select_dict["pagination_list"]][page]
         print(select_dict["select_msg"])
         self._print_list(product_list)  # print the product list : number - product
         self._print_page(page + 1, max_page)  # print page current/total
-        
+
         answer = input("\nVotre choix : ")
         if answer.upper() in "NP":
             self._change_page(max_page, answer)  # increase/decrease page in current_screen
@@ -168,6 +217,13 @@ class Gui():
                 self.current_screen.append((target_screen, origin_id, substitute_id))
 
     def screen_select_product(self, category_id, page):
+        """Print the Product page selection.
+
+        Args:
+            category_id (int): the id of Category
+            page (int): the current page
+
+        """
         select_product = {
             "pagination_list": "product",
             "query": self.db.get_product(category_id),
@@ -178,6 +234,13 @@ class Gui():
         self._screen_select_show(select_product, category_id, page)
 
     def screen_select_substitute(self, origin_id, page):
+        """Print the substitute page selection.
+
+        Args:
+            origin_id (int): the id of origin Product
+            page (int): the current page
+
+        """
         select_substitute_saved = {
             "pagination_list": "substitute",
             "query": self.db.get_better_product(origin_id),
@@ -188,6 +251,13 @@ class Gui():
         self._screen_select_show(select_substitute_saved, origin_id, page)
 
     def screen_select_substitute_saved(self, _, page):
+        """Print the saved combinaison of products/substitutes.
+
+        Args:
+            _: nothing, just set to fit the structure of standard list screen
+            page (int): the current page
+
+        """
         select_substitute_saved = {
             "pagination_list": "saved_substitute",
             "query": self.db.get_substitute_saved,
@@ -198,6 +268,21 @@ class Gui():
         self._screen_select_show(select_substitute_saved, _, page)
 
     def screen_detail_substitute(self, origin_id, substitute_id):
+        """Print the detail screen of origin and substitute products.
+
+        Args:
+            origin_id (int): the id of origin Product
+            substitute_id (int): id of substitute product
+
+        Print:
+            origin product description + nutrition grades
+            substitute product description +nutrition grades
+            + stores + url
+
+        show if saved
+        allow to save/delete association
+
+        """
         (origin_designation, origin_grade, substitute_designation, substitute_grade, \
             url, stores, \
             substitute_exist) = self.db.show_product_detail(origin_id, substitute_id)[0]
