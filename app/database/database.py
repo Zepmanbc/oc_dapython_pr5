@@ -25,11 +25,11 @@ class Database():
 
     """
 
-    def __init__(self, dbconnect):
+    def __init__(self, DBCONNECT):
         """Initialyse the connection.
 
         Args:
-            dbconnect (dict): configuration
+            DBCONNECT (dict): configuration
                 default:
                     {
                         "QUANTITY_PRODUCTS" : 200,
@@ -43,7 +43,7 @@ class Database():
 
         If connection is not ok, set mydb to False
         """
-        self.dbconnect = dbconnect
+        self.dbconnect = DBCONNECT
 
         self.pagination_list = {
             "product": [],
@@ -429,7 +429,7 @@ if __name__ == "__main__":
     import sys
     sys.path.append('.')
     # import config
-    # db = Database(config.dbconnect)
+    # db = Database(config.DBCONNECT)
 
     # """CREATE AND FILL IN"""
     # db.cursor = db.mydb.cursor()

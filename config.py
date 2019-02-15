@@ -4,7 +4,7 @@ QUANTITY_PRODUCTS : max numbers of Downloads from OpenfFoodFact per category, 0 
 
 """
 
-dbconnect = {
+DBCONNECT = {
     "QUANTITY_PRODUCTS" : 200,
     "HOST" : "localhost",
     "USER" : "root",
