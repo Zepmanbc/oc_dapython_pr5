@@ -9,7 +9,7 @@ import config
 def main():
     """Run the software."""
     gui = Gui(config.dbconnect)
-    if hasattr(gui, "current_screen"):
+    if hasattr(gui, "current_screen") and gui.db.mydb:
         while len(gui.current_screen):
             gui.screen_select()   
 
