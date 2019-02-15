@@ -60,6 +60,10 @@ class Gui():
         screen = self.current_screen[-1]
         self.screen_config[screen[0]](*screen[1:])
 
+    ####################
+    # Specific Screens #
+    ####################
+
     def screen_intro(self):
         """Print the intro screen."""
         print("""
@@ -94,6 +98,58 @@ class Gui():
                     target_id = category_list[answer - 1][0]
                     page = 0
                     self.current_screen.append((target_screen, target_id, page))
+
+    def screen_detail_substitute(self, origin_id, substitute_id):
+        """Print the detail screen of origin and substitute products.
+
+        Args:
+            origin_id (int): the id of origin Product
+            substitute_id (int): id of substitute product
+
+        Print:
+            origin product description + nutrition grades
+            substitute product description +nutrition grades
+            + stores + url
+
+        show if saved
+        allow to save/delete association
+
+        """
+        (origin_designation, origin_grade, substitute_designation, substitute_grade, \
+            url, stores, \
+            substitute_exist) = self.db.show_product_detail(origin_id, substitute_id)[0]
+        print("Produit d'origine :\n    {}".format(origin_designation))
+        print("    nutrition grade : {}\n".format(origin_grade.upper()))
+        print("Produit de substitution :\n    {}".format(substitute_designation))
+        print("    nutrition grade : {}".format(substitute_grade.upper()))
+        print("    magasins : {}".format(stores))
+        print("    url : {}".format(url))
+        print("\nRetour : 0")
+        if substitute_exist:
+            print("Combinaison existante, pour la supprimer : 1")
+        else:
+            print("Pour enregistrer la combinaisons : 1")
+
+        answer = input("\nVotre choix : ")
+        if answer == '0':
+            self.current_screen.pop()
+        elif answer == '1':
+            if substitute_exist:
+                self.db.delete_substitute(substitute_exist)
+            else:
+                self.db.set_substitute(origin_id, substitute_id)
+
+    ################################
+    # Screens construction methods #
+    ################################
+
+    @staticmethod
+    def clear():
+        """Clear console."""
+        if os.uname()[0] == "Windows":
+            os.system('cls')
+        else:
+            os.system('clear')
 
     @staticmethod
     def _print_list(product_list):
@@ -174,7 +230,7 @@ class Gui():
 
         """
         if select_dict["pagination_list"] == "saved_substitute":
-            # refresh list of item have been deleted
+            # refresh list if item have been deleted
             self.db.pagination_list[select_dict["pagination_list"]].clear()
             select_dict["query"]()
 
@@ -215,6 +271,10 @@ class Gui():
                 origin_id = product_list[answer - 1][2]
                 substitute_id = product_list[answer - 1][3]
                 self.current_screen.append((target_screen, origin_id, substitute_id))
+
+    #########################
+    # Standard List Screens #
+    #########################
 
     def screen_select_product(self, category_id, page):
         """Print the Product page selection.
@@ -266,54 +326,6 @@ class Gui():
             "target_screen": "screen_detail_substitute"
         }
         self._screen_select_show(select_substitute_saved, _, page)
-
-    def screen_detail_substitute(self, origin_id, substitute_id):
-        """Print the detail screen of origin and substitute products.
-
-        Args:
-            origin_id (int): the id of origin Product
-            substitute_id (int): id of substitute product
-
-        Print:
-            origin product description + nutrition grades
-            substitute product description +nutrition grades
-            + stores + url
-
-        show if saved
-        allow to save/delete association
-
-        """
-        (origin_designation, origin_grade, substitute_designation, substitute_grade, \
-            url, stores, \
-            substitute_exist) = self.db.show_product_detail(origin_id, substitute_id)[0]
-        print("Produit d'origine :\n    {}".format(origin_designation))
-        print("    nutrition grade : {}\n".format(origin_grade.upper()))
-        print("Produit de substitution :\n    {}".format(substitute_designation))
-        print("    nutrition grade : {}".format(substitute_grade.upper()))
-        print("    magasins : {}".format(stores))
-        print("    url : {}".format(url))
-        print("\nRetour : 0")
-        if substitute_exist:
-            print("Combinaison existante, pour la supprimer : 1")
-        else:
-            print("Pour enregistrer la combinaisons : 1")
-
-        answer = input("\nVotre choix : ")
-        if answer == '0':
-            self.current_screen.pop()
-        elif answer == '1':
-            if substitute_exist:
-                self.db.delete_substitute(substitute_exist)
-            else:
-                self.db.set_substitute(origin_id, substitute_id)
-
-    @staticmethod
-    def clear():
-        """Clear console."""
-        if os.uname()[0] == "Windows":
-            os.system('cls')
-        else:
-            os.system('clear')
 
 if __name__ == "__main__":
     sys.path.append('.')
