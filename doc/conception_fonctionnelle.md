@@ -2,14 +2,6 @@
 
 Pure Beurre a besoin d'une application qui permet de proposer des alternatives à un certain nombre de produits alimentaire du quotidien.
 
-# Organisation
-
-## la Démarche
-* Initialisation du [repo sur Github](https://github.com/Zepmanbc/oc_dapython_pr5)
-* Création du [Trello](https://trello.com/b/NFvfd67Q/ocdapythonpr5)
-* Rédaction de la [documentation](https://github.com/Zepmanbc/oc_dapython_pr5/blob/master/doc/documentation.md)
-* Analyse de l'[API OpenFoodFacts](https://en.wiki.openfoodfacts.org/API/Read/Search)
-
 # 1 - Règles fonctionnelles
 
 Il y aura 9 *catégories* de produits.
