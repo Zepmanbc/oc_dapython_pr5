@@ -22,7 +22,7 @@ Analyse de l'[API OpenFoodFacts](https://en.wiki.openfoodfacts.org/API/Read/Sear
 
 *Ecrire le modèle physique de données.*
 
-[Document de conception fonctionnelle](conception_fonctionnelle.md)
+[Document de conception fonctionnelle](https://github.com/Zepmanbc/oc_dapython_pr5/blob/master/doc/conception_fonctionnelle.md)
 
 *Avoir un script pour la création de la base.* 
 
