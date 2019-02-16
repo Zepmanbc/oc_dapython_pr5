@@ -16,7 +16,7 @@ Install libraries.
 
 Set executable.
 
-    chmod +x purebeurre.py
+    chmod +x pur_beurre.py
 
 # Configure LAMP server with docker
 
@@ -70,6 +70,10 @@ QUANTITY_PRODUCTS define the max downloaded products (step is 200), if it is set
 
 The first time you run it, the database (MySQL) will be created and be filled.
 
+You can force to delete DATABASE and download again the data:
+    
+    ./createdb.py
+
 ## Search a substitute
 
 You will have to select what you want to do
@@ -95,3 +99,5 @@ On the main screen select `2`.
     2 . Show saved products
 
 Select your saved product to see details.
+
+if you want to remove the combinaison, use `1`.
