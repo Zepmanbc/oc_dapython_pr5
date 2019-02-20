@@ -74,7 +74,7 @@ Si l'on souhaite rajouter des fonctionnalités, il sera également possible de "
 
 ---
 
-## L'appel des procédures qui faisait planter le curseur
+## L'appel des procédures qui faisaient planter le curseur
 
 J'ai choisi d'utiliser des procédures pour les requêtes un peu plus "complexes" que juste l'interrogation  d'une table.
 
