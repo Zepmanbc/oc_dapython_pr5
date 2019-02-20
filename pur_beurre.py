@@ -3,7 +3,7 @@
 import sys
 
 import config
-sys.path.append('app/')
+# sys.path.append('app/')
 from app.gui.gui import Gui
 
 def main():

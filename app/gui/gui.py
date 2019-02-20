@@ -3,8 +3,11 @@
 import sys
 import os
 
-sys.path.append('app/')
-from database.database import Database
+if __name__ == "__main__":
+    sys.path.append('app/')
+    from database.database import Database
+else:
+    from ..database.database import Database
 
 
 class Gui():
